@@ -1,0 +1,17 @@
+{% import "bootstrap/wtf.html" as wtf %}
+{% include "header.html" %}
+
+{% block content %}
+
+  <div class="container">
+    <div class="row">
+      <div class="col-md-6">
+        {% if error %}
+            <p class=error> {{ error }}
+        {% endif %}
+        {{ wtf.quick_form(form, novalidate=True, button_map={"submit": "primary"}) }}
+      </div>
+    </div>
+  </div>
+
+{% endblock %}

@@ -1,0 +1,110 @@
+{% include "header.html" %}
+
+
+{% block content %}
+{% if not logged_in %}
+
+<div class="jumbotron">
+        <div class="container">
+          <h1 class="display-3">Добро пожаловать!</h1>
+          <p>Для получения информации о пропусках для въезда на территорию Новово 2,
+            пожалуйста, зарегистрируйтесь или войдите в личный кабинет.</p>
+          <p><a class="btn btn-primary btn-lg" href="{{url_for('login')}}" role="button">Войти</a>
+          <a class="btn btn-primary btn-lg" href="{{url_for('register')}}" role="button">Регистрация</a></p>
+        </div>
+</div>
+
+{% else %}
+
+<div class="container">
+  <h2>Информация о пропусках</h2>
+  <div class="row">
+    <div  class="col-md-6">
+      <table class="table table-striped table-hover">
+        <h3>Автомобили с временным пропуском</h3>
+        <thead>
+          <tr>
+            <th scope="col">Номер автомобиля</th>
+            <th scope="col">Участок</th>
+            <th scope="col">Действие пропуска</th>
+            <th scope="col"></th>
+            <th scope="col"></th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for vehicle in pass_list %}
+          {% if id == vehicle.plot_owner.id or id == 2 %}
+          <tr>
+            <td>{{vehicle.vin}}</td>
+            <td>{{vehicle.plot_number}}</td>
+            {% if (vehicle.expiry_date - today).days < 0 %}
+            <td style="color: red">до {{vehicle.expiry_date.strftime("%d-%m-%Y")}}</td>
+            {% else %}
+            <td>до {{vehicle.expiry_date.strftime("%d-%m-%Y")}}</td>
+            {% endif %}
+            {% if id != 2 %}
+            <td><a href="{{url_for('update_pass', pass_id=vehicle.id) }}">↻</a></td>
+            <td><a href="{{url_for('delete_pass', pass_id=vehicle.id) }}">✗</a></td>
+            {% else %}
+            <td></td>
+            <td></td>
+            {% endif %}
+          </tr>
+          {% endif %}
+          {% endfor %}
+        </tbody>
+      </table>
+      {% if id != 2 %}
+      <div class="clearfix">
+          <a class="btn btn-primary float-right" href="{{url_for('new_pass')}}">Новый пропуск</a>
+      </div>
+      {% endif %}
+    </div>
+    <div  class="col-md-6">
+      <table class="table table-striped table-hover">
+        {% if id == 2 %}
+        <h3>Автомобили владельцев участков</h3>
+        {% else %}
+        <h3>Личные транспортные средства</h3>
+        {% endif %}
+        <thead>
+          <tr>
+            <th scope="col">Номер автомобиля</th>
+            <th scope="col">Участок</th>
+            <th scope="col"></th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for vehicle in transport_list %}
+          {% if id == vehicle.owner.id or id == 2 %}
+          <tr>
+            <td>{{vehicle.vin}}</td>
+            <td>{{vehicle.plot_number}}</td>
+            {% if id != 2 %}
+            <td><a href="{{url_for('delete_transport', transport_id=vehicle.id) }}">✗</a></td>
+            {% else %}
+            <td></td>
+            {% endif %}
+          </tr>
+          {% endif %}
+          {% endfor %}
+        </tbody>
+      </table>
+      {% if id != 2 %}
+      <div class="clearfix">
+          <a class="btn btn-primary float-right" href="{{url_for('add_transport')}}">Добавить</a>
+      </div>
+      {% endif %}
+    </div>
+    </div>
+
+  </div>
+</div>
+
+  <div class="container">
+    <h1 class="mt-5"></h1>
+    <p class="mb-2">Пропуск действует до указанной даты включительно. Через 7 дней по его истечении пропуск автоматически удаляется из списка.</p>
+  </div>
+
+{% endif %}
+{% endblock %}
