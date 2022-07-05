@@ -30,7 +30,6 @@ class User(UserMixin, db.Model):
     plot_number = Column(Integer, unique=True, nullable=False)
     first_name = Column(String(100), nullable=False)
     last_name = Column(String(100), nullable=False)
-    # TODO: determine requirements for signing in
     login = Column(String(100), unique=True)
     password = Column(String(100))
 
@@ -43,6 +42,7 @@ class PersonalTransport(db.Model):
     id = Column(Integer, primary_key=True)
     # Vehicle Identification Number
     vin = Column(String(100), unique=True)
+    car_model = Column(String(100))
     owner = relationship("User", back_populates="personal_transport")
     plot_number = Column(Integer, ForeignKey("users.plot_number"))
 
@@ -52,6 +52,7 @@ class PassTransport(db.Model):
     id = Column(Integer, primary_key=True)
     # Vehicle Identification Number
     vin = Column(String(100), unique=True, nullable=False)
+    car_model = Column(String(100))
     plot_owner = relationship("User", back_populates="pass_transport")
     plot_number = Column(Integer, ForeignKey("users.plot_number"))
     expiry_date = Column(Date, nullable=False)
@@ -60,7 +61,7 @@ class PassTransport(db.Model):
 db.create_all()
 
 
-# Delete outdated data from db
+# Delete outdated data from db in 7 days
 def delete_outdated_data():
     today = date.today()
     pass_transport = PassTransport.query.all()
@@ -99,7 +100,8 @@ def new_pass():
     error = None
     form = NewPassForm()
     if form.validate_on_submit():
-        new_vin = form.vin.data
+        new_vin = form.vin.data.upper()
+        new_car_model = form.car_model.data.upper()
         # Variable expiry_date is datetime.date type
         new_expiry_date = form.validation_period.data
         pass_transport = PassTransport.query.filter_by(vin=new_vin).first()
@@ -107,7 +109,8 @@ def new_pass():
             error = f"У данного автомобиля уже есть пропуск до {pass_transport.expiry_date.strftime('%d-%m-%Y')}."
         else:
             plot_n = User.query.get(current_user.get_id()).plot_number
-            new_pass_transport = PassTransport(vin=new_vin, plot_number=plot_n, expiry_date=new_expiry_date)
+            new_pass_transport = PassTransport(vin=new_vin, car_model=new_car_model,
+                                               plot_number=plot_n, expiry_date=new_expiry_date)
             db.session.add(new_pass_transport)
             db.session.commit()
             return redirect(url_for("home"))
@@ -118,9 +121,10 @@ def new_pass():
 def add_transport():
     form = NewTransportForm()
     if form.validate_on_submit():
-        new_vin = form.vin.data
+        new_vin = form.vin.data.upper()
+        new_car_model = form.car_model.data.upper()
         plot_n = User.query.get(current_user.get_id()).plot_number
-        new_transport = PersonalTransport(vin=new_vin, plot_number=plot_n)
+        new_transport = PersonalTransport(vin=new_vin, car_model=new_car_model, plot_number=plot_n)
         db.session.add(new_transport)
         db.session.commit()
         return redirect(url_for("home"))
@@ -132,7 +136,7 @@ def login():
     error = None
     form = SignInForm()
     if form.validate_on_submit():
-        login_name = form.login.data
+        login_name = form.login.data.lower()
         password = form.password.data
 
         user = User.query.filter_by(login=login_name).first()
@@ -155,13 +159,18 @@ def register():
                                                           'pbkdf2:sha256',
                                                           8)
         user = User.query.filter_by(plot_number=register_form.plot_number.data).first()
+        login_in_use = User.query.filter_by(login=register_form.login.data).first()
         if user:
-            error = "Для данного участка уже имеется личный кабинет."
+            error = 'Для данного участка уже имеется личный кабинет, пожалуйста, нажмите кнопку "войти".'
+        elif login_in_use:
+            error = "Данный логин уже используется, пожалуйста, придумайте новый."
+        elif register_form.password.data != register_form.repeat_password.data:
+            error = "Пароли не совпадаеют, пожалуйста, введите еще раз."
         else:
-            new_user = User(first_name=register_form.first_name.data,
-                            last_name=register_form.last_name.data,
+            new_user = User(first_name=register_form.first_name.data.title(),
+                            last_name=register_form.last_name.data.title(),
                             plot_number=register_form.plot_number.data,
-                            login=register_form.login.data,
+                            login=register_form.login.data.lower(),
                             password=hash_and_salted_password)
             db.session.add(new_user)
             db.session.commit()

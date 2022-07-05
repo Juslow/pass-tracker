@@ -15,9 +15,11 @@
         <li><a href="{{url_for('register')}}">Регистрация</a></li>
         {% else %}
         <li><a href="{{url_for('logout')}}">Выйти</a></li>
+        <!--
           {% if id != 2 %}
         <li><a href="{{url_for('new_pass')}}">Новый пропуск</a></li>
           {% endif %}
+          -->
         {% endif %}
       </ul>
     </div>
