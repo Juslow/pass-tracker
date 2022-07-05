@@ -4,12 +4,14 @@
 {% block content %}
 
   <div class="container">
+    <h2>Вход в личной кабинет</h2>
     <div class="row">
       <div class="col-lg-8 col-md-10 mx-auto content">
         {% if error %}
             <p class=error> {{ error }}
         {% endif %}
         {{ wtf.quick_form(form, novalidate=True, button_map={"submit": "primary"}) }}
+        <a class="btn btn-secondary" href="{{url_for('user_validation')}}" role="button">Сброс пароля</a>
       </div>
     </div>
   </div>

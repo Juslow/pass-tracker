@@ -44,3 +44,19 @@ class RegisterForm(FlaskForm):
                              description="Используйте минимум 6 символов.")
     repeat_password = PasswordField("Повторите пароль", validators=[DataRequired("Заполните поле")])
     submit = SubmitField("Зарегистрироваться")
+
+
+class UserValidationForm(FlaskForm):
+    first_name = StringField("Имя", validators=[DataRequired("Заполните поле")])
+    last_name = StringField("Фамилия", validators=[DataRequired("Заполните поле")])
+    plot_number = IntegerField("Номер участка", validators=[DataRequired("Заполните поле")])
+    login = StringField("Логин", validators=[DataRequired("Заполните поле")])
+    submit = SubmitField("Далее")
+
+
+class PasswordResetForm(FlaskForm):
+    password = PasswordField("Пароль", validators=[DataRequired("Заполните поле"),
+                                                   Length(6, 16, "Используйте минимум 6 символов.")],
+                             description="Используйте минимум 6 символов.")
+    repeat_password = PasswordField("Повторите пароль", validators=[DataRequired("Заполните поле")])
+    submit = SubmitField("Сохранить новый пароль")

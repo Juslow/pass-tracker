@@ -5,7 +5,8 @@ from flask_bootstrap import Bootstrap
 from flask_login import UserMixin, login_user, LoginManager, current_user, logout_user
 from sqlalchemy.orm import relationship
 from werkzeug.security import generate_password_hash, check_password_hash
-from forms import NewPassForm, SignInForm, NewTransportForm, UpdatePassForm, RegisterForm
+from forms import NewPassForm, SignInForm, NewTransportForm, UpdatePassForm, \
+    RegisterForm, UserValidationForm, PasswordResetForm
 from datetime import date, timedelta
 import os
 
@@ -141,7 +142,7 @@ def login():
 
         user = User.query.filter_by(login=login_name).first()
         if not user:
-            error = "Такого логина не существует, пожалуйста попробуйте еще раз."
+            error = "Такого логина не существует, пожалуйста, попробуйте еще раз."
         elif check_password_hash(user.password, password):
             login_user(user)
             return redirect(url_for("home"))
@@ -179,6 +180,44 @@ def register():
                            error=error, logged_in=current_user.is_authenticated)
 
 
+@app.route('/user-validation', methods=["GET", "POST"])
+def user_validation():
+    error = None
+    user_validation_form = UserValidationForm()
+    if user_validation_form.validate_on_submit():
+        first_name = user_validation_form.first_name.data.title()
+        last_name = user_validation_form.last_name.data.title()
+        login = user_validation_form.login.data.lower()
+        user = User.query.filter_by(plot_number=user_validation_form.plot_number.data).first()
+        if user:
+            if user.first_name == first_name and user.last_name == last_name and user.login == login:
+                return redirect(url_for('password_reset', user_id=user.id))
+            else:
+                error = 'Введены неправильные данные'
+        else:
+            error = 'Введены неправильные данные'
+    return render_template('user-validation.html', form=user_validation_form,
+                           logged_in=current_user.is_authenticated, error=error)
+
+
+@app.route('/password-reset/<int:user_id>', methods=["GET", "POST"])
+def password_reset(user_id):
+    error = None
+    password_reset_form = PasswordResetForm()
+    user_password_reset = User.query.get(user_id)
+    if password_reset_form.validate_on_submit():
+        if password_reset_form.password.data != password_reset_form.repeat_password.data:
+            error = "Пароли не совпадаеют, пожалуйста, введите еще раз."
+        else:
+            hash_and_salted_password = generate_password_hash(password_reset_form.password.data,
+                                                              'pbkdf2:sha256',
+                                                              8)
+            user_password_reset.password = hash_and_salted_password
+            db.session.commit()
+            return redirect(url_for('login'))
+    return render_template('password-reset.html', form=password_reset_form, error=error)
+
+
 @app.route('/update/<int:pass_id>', methods=["GET", "POST"])
 def update_pass(pass_id):
     pass_to_update = PassTransport.query.get(pass_id)
@@ -187,7 +226,8 @@ def update_pass(pass_id):
         pass_to_update.expiry_date = update_form.validation_period.data
         db.session.commit()
         return redirect(url_for('home'))
-    return render_template('update-pass.html', form=update_form, logged_in=current_user.is_authenticated)
+    return render_template('update-pass.html', form=update_form,
+                           logged_in=current_user.is_authenticated)
 
 
 @app.route('/delete-pass/<int:pass_id>')
