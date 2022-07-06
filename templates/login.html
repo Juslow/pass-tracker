@@ -11,7 +11,10 @@
             <p class=error> {{ error }}
         {% endif %}
         {{ wtf.quick_form(form, novalidate=True, button_map={"submit": "primary"}) }}
-        <a class="btn btn-secondary" href="{{url_for('user_validation')}}" role="button">Сброс пароля</a>
+        <p>
+            Забыли пароль?
+            <a href="{{url_for('reset_password_request')}}">Нажмите здесь, чтобы сбросить</a>
+        </p>
       </div>
     </div>
   </div>

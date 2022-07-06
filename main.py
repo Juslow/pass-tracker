@@ -1,4 +1,4 @@
-from flask import Flask, render_template, redirect, url_for
+from flask import Flask, render_template, redirect, url_for, flash
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import Column, Integer, String, ForeignKey, Date
 from flask_bootstrap import Bootstrap
@@ -6,22 +6,44 @@ from flask_login import UserMixin, login_user, LoginManager, current_user, logou
 from sqlalchemy.orm import relationship
 from werkzeug.security import generate_password_hash, check_password_hash
 from forms import NewPassForm, SignInForm, NewTransportForm, UpdatePassForm, \
-    RegisterForm, UserValidationForm, PasswordResetForm
+    RegisterForm, ResetPasswordRequestForm, PasswordResetForm
 from datetime import date, timedelta
+from time import time
+import jwt
+from flask_mail import Message, Mail
 import os
 
-app = Flask(__name__)
-# TODO: Secret key should be used in Hiroku later
-app.config['SECRET_KEY'] = "lsdfDm93EmpjI8WQm2"
-db = SQLAlchemy(app)
-Bootstrap(app)
+# for adding environment variables with file .env
+# from dotenv import load_dotenv
+# load_dotenv('.env')
 
-# Connect to DB
+
+app = Flask(__name__)
+
+# TODO: Try to create ConfigClass(object) (https://flask-user.readthedocs.io/en/latest/basic_app.html)
+
+
+app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY')
+app.config['MAIL_SERVER'] = 'smtp.googlemail.com'
+app.config['MAIL_PORT'] = 587
+app.config['MAIL_USE_TLS'] = True
+app.config['MAIL_USERNAME'] = os.environ.get('MAIL_USERNAME')
+app.config['MAIL_DEFAULT_SENDER'] = os.environ.get('MAIL_DEFAULT_SENDER')
+app.config['MAIL_PASSWORD'] = os.environ.get('MAIL_PASSWORD')
+
 app.config['SQLALCHEMY_DATABASE_URI'] = "sqlite:///car-pass.db"
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
+db = SQLAlchemy(app)
+Bootstrap(app)
+
+
+# TODO: Connect PostgreSQL
+
+
 login_manager = LoginManager()
 login_manager.init_app(app)
+mail = Mail(app)
 
 
 # -----------------CONFIGURE DB TABLES----------------------
@@ -31,11 +53,25 @@ class User(UserMixin, db.Model):
     plot_number = Column(Integer, unique=True, nullable=False)
     first_name = Column(String(100), nullable=False)
     last_name = Column(String(100), nullable=False)
-    login = Column(String(100), unique=True)
-    password = Column(String(100))
+    email = Column(String(255), unique=True, nullable=False)
+    password = Column(String(255), nullable=False)
 
     personal_transport = relationship("PersonalTransport", back_populates="owner")
     pass_transport = relationship("PassTransport", back_populates="plot_owner")
+
+    def get_reset_password_token(self, expires_in=600):
+        return jwt.encode(
+            {'reset_password': self.id, 'exp': time() + expires_in},
+            app.config['SECRET_KEY'], algorithm='HS256')
+
+    @staticmethod
+    def verify_reset_password_token(token):
+        try:
+            id = jwt.decode(token, app.config['SECRET_KEY'],
+                            algorithms=['HS256'])['reset_password']
+        except:
+            return
+        return User.query.get(id)
 
 
 class PersonalTransport(db.Model):
@@ -62,15 +98,30 @@ class PassTransport(db.Model):
 db.create_all()
 
 
-# Delete outdated data from db in 7 days
-def delete_outdated_data():
+def delete_outdated_data(expire_time):
+    """Deletes outdated transport passes in defined expire time (days)."""
     today = date.today()
     pass_transport = PassTransport.query.all()
     for transport in pass_transport:
         expiry_date = transport.expiry_date
-        if (expiry_date - today).days < -7:
+        if (expiry_date - today).days > expire_time:
             db.session.delete(transport)
             db.session.commit()
+
+
+def send_email(subject, sender, recipients, html_body):
+    msg = Message(subject, sender=sender, recipients=recipients)
+    msg.html = html_body
+    mail.send(msg)
+
+
+def send_password_reset_email(user):
+    token = user.get_reset_password_token()
+    send_email('[НОВОВО 2] Сброс пароля',
+               sender=app.config['MAIL_DEFAULT_SENDER'],
+               recipients=[user.email],
+               html_body=render_template('email/reset_password_text.html',
+                                         user=user, token=token))
 
 
 @login_manager.user_loader
@@ -81,7 +132,7 @@ def load_user(user_id):
 # ---------------------Web routes-----------------------
 @app.route("/")
 def home():
-    delete_outdated_data()
+    delete_outdated_data(expire_time=7)
     vehicles_pass_list = PassTransport.query.all()
     personal_transport_list = PersonalTransport.query.all()
     if current_user.is_authenticated:
@@ -137,10 +188,10 @@ def login():
     error = None
     form = SignInForm()
     if form.validate_on_submit():
-        login_name = form.login.data.lower()
+        email = form.email.data.lower()
         password = form.password.data
 
-        user = User.query.filter_by(login=login_name).first()
+        user = User.query.filter_by(email=email).first()
         if not user:
             error = "Такого логина не существует, пожалуйста, попробуйте еще раз."
         elif check_password_hash(user.password, password):
@@ -160,62 +211,60 @@ def register():
                                                           'pbkdf2:sha256',
                                                           8)
         user = User.query.filter_by(plot_number=register_form.plot_number.data).first()
-        login_in_use = User.query.filter_by(login=register_form.login.data).first()
+        email_in_use = User.query.filter_by(email=register_form.email.data).first()
         if user:
             error = 'Для данного участка уже имеется личный кабинет, пожалуйста, нажмите кнопку "войти".'
-        elif login_in_use:
+        elif email_in_use:
             error = "Данный логин уже используется, пожалуйста, придумайте новый."
-        elif register_form.password.data != register_form.repeat_password.data:
-            error = "Пароли не совпадаеют, пожалуйста, введите еще раз."
         else:
             new_user = User(first_name=register_form.first_name.data.title(),
                             last_name=register_form.last_name.data.title(),
                             plot_number=register_form.plot_number.data,
-                            login=register_form.login.data.lower(),
+                            email=register_form.email.data.lower(),
                             password=hash_and_salted_password)
             db.session.add(new_user)
             db.session.commit()
+            flash('Вы успешно зарегистрировались')
             return redirect(url_for("login"))
     return render_template("register.html", form=register_form,
                            error=error, logged_in=current_user.is_authenticated)
 
 
-@app.route('/user-validation', methods=["GET", "POST"])
-def user_validation():
+@app.route('/reset-password-request', methods=["GET", "POST"])
+def reset_password_request():
     error = None
-    user_validation_form = UserValidationForm()
-    if user_validation_form.validate_on_submit():
-        first_name = user_validation_form.first_name.data.title()
-        last_name = user_validation_form.last_name.data.title()
-        login = user_validation_form.login.data.lower()
-        user = User.query.filter_by(plot_number=user_validation_form.plot_number.data).first()
+    if current_user.is_authenticated:
+        return redirect(url_for('index'))
+    form = ResetPasswordRequestForm()
+    if form.validate_on_submit():
+        user = User.query.filter_by(email=form.email.data).first()
         if user:
-            if user.first_name == first_name and user.last_name == last_name and user.login == login:
-                return redirect(url_for('password_reset', user_id=user.id))
-            else:
-                error = 'Введены неправильные данные'
+            send_password_reset_email(user)
+            flash('На почту высланы инструкции для сброса пароля. Если не видите письма, проверьте папку "спам"')
+            return redirect(url_for('login'))
         else:
-            error = 'Введены неправильные данные'
-    return render_template('user-validation.html', form=user_validation_form,
+            error = 'Данная электронная почта не зарегистрирована'
+    return render_template('reset-password-request.html', form=form,
                            logged_in=current_user.is_authenticated, error=error)
 
 
-@app.route('/password-reset/<int:user_id>', methods=["GET", "POST"])
-def password_reset(user_id):
-    error = None
-    password_reset_form = PasswordResetForm()
-    user_password_reset = User.query.get(user_id)
-    if password_reset_form.validate_on_submit():
-        if password_reset_form.password.data != password_reset_form.repeat_password.data:
-            error = "Пароли не совпадаеют, пожалуйста, введите еще раз."
-        else:
-            hash_and_salted_password = generate_password_hash(password_reset_form.password.data,
-                                                              'pbkdf2:sha256',
-                                                              8)
-            user_password_reset.password = hash_and_salted_password
-            db.session.commit()
-            return redirect(url_for('login'))
-    return render_template('password-reset.html', form=password_reset_form, error=error)
+@app.route('/reset-password/<token>', methods=["GET", "POST"])
+def reset_password(token):
+    if current_user.is_authenticated:
+        return redirect(url_for('home'))
+    user = User.verify_reset_password_token(token)
+    if not user:
+        return redirect(url_for('home'))
+    form = PasswordResetForm()
+    if form.validate_on_submit():
+        hash_and_salted_password = generate_password_hash(form.password.data,
+                                                          'pbkdf2:sha256',
+                                                          8)
+        user.password = hash_and_salted_password
+        db.session.commit()
+        flash("Пароль успешно обновлен")
+        return redirect(url_for('login'))
+    return render_template('reset-password.html', form=form)
 
 
 @app.route('/update/<int:pass_id>', methods=["GET", "POST"])

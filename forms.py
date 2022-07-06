@@ -1,6 +1,6 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField, PasswordField, DateField, IntegerField
-from wtforms.validators import DataRequired, Length
+from wtforms.validators import DataRequired, Length, EqualTo, Email
 
 
 class NewPassForm(FlaskForm):
@@ -26,7 +26,9 @@ class NewTransportForm(FlaskForm):
 
 
 class SignInForm(FlaskForm):
-    login = StringField("Логин", validators=[DataRequired("Заполните поле")])
+    email = StringField("Электронная почта",
+                        validators=[DataRequired("Заполните поле"),
+                                    Email("Необходимо ввести электронную почту (например: example@email.com)")])
     password = PasswordField("Пароль", validators=[DataRequired("Заполните поле")])
     submit = SubmitField("Вход")
 
@@ -35,28 +37,32 @@ class RegisterForm(FlaskForm):
     first_name = StringField("Имя", validators=[DataRequired("Заполните поле")])
     last_name = StringField("Фамилия", validators=[DataRequired("Заполните поле")])
     plot_number = IntegerField("Номер участка", validators=[DataRequired("Заполните поле")])
-    login = StringField("Логин для входа в личный кабинет",
+    email = StringField("Электронная почта",
                         validators=[DataRequired("Заполните поле"),
-                                    Length(4, 10, "Для логина используйте от 4 до 10 символов.")])
+                                    Email("Необходимо ввести электронную почту (например: example@email.com)")])
     password = PasswordField("Пароль",
                              validators=[DataRequired("Заполните поле"),
                                          Length(min=6, max=16, message="Используйте минимум 6 символов.")],
                              description="Используйте минимум 6 символов.")
-    repeat_password = PasswordField("Повторите пароль", validators=[DataRequired("Заполните поле")])
+    repeat_password = PasswordField("Повторите пароль",
+                                    validators=[DataRequired("Заполните поле"),
+                                                EqualTo('password', "Пароли не совпадают")])
     submit = SubmitField("Зарегистрироваться")
 
 
-class UserValidationForm(FlaskForm):
-    first_name = StringField("Имя", validators=[DataRequired("Заполните поле")])
-    last_name = StringField("Фамилия", validators=[DataRequired("Заполните поле")])
-    plot_number = IntegerField("Номер участка", validators=[DataRequired("Заполните поле")])
-    login = StringField("Логин", validators=[DataRequired("Заполните поле")])
-    submit = SubmitField("Далее")
+# TODO: Make form for requesting password reset instead
+class ResetPasswordRequestForm(FlaskForm):
+    email = StringField("Электронная почта",
+                        validators=[DataRequired("Заполните поле"),
+                                    Email("Необходимо ввести электронную почту (например: example@email.com)")])
+    submit = SubmitField("Сбросить пароль")
 
 
 class PasswordResetForm(FlaskForm):
     password = PasswordField("Пароль", validators=[DataRequired("Заполните поле"),
                                                    Length(6, 16, "Используйте минимум 6 символов.")],
                              description="Используйте минимум 6 символов.")
-    repeat_password = PasswordField("Повторите пароль", validators=[DataRequired("Заполните поле")])
+    repeat_password = PasswordField("Повторите пароль",
+                                    validators=[DataRequired("Заполните поле"),
+                                                EqualTo('password', "Пароли не совпадают")])
     submit = SubmitField("Сохранить новый пароль")
