@@ -219,7 +219,7 @@ def login():
 
         user = User.query.filter_by(email=email).first()
         if not user:
-            error = "Такого логина не существует, пожалуйста, попробуйте еще раз."
+            error = "Личного кабинета с такой электронной почтой не существует."
         elif check_password_hash(user.password, password):
             login_user(user)
             return redirect(url_for("transport_list"))
