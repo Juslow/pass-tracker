@@ -4,24 +4,20 @@ from wtforms.validators import DataRequired, Length, EqualTo, Email
 
 
 class NewPassForm(FlaskForm):
-    vin = StringField("Номер автомобиля", validators=[DataRequired("Заполните поле")],
-                      description="Например: Е999КН77")
-    car_model = StringField("Марка автомобиля", validators=[DataRequired("Заполните поле")],
-                            description="Например: BMW, Honda, KIA и т.д.")
+    vin = StringField("Номер автомобиля", validators=[DataRequired("Заполните поле")])
+    car_model = StringField("Марка автомобиля", validators=[DataRequired("Заполните поле")])
     validation_period = DateField("Пропуск до", validators=[DataRequired("Заполните поле")])
     submit = SubmitField("Отправить")
 
 
 class UpdatePassForm(FlaskForm):
-    validation_period = DateField("Обновить действие пропуска до", validators=[DataRequired("Заполните поле")])
+    validation_period = DateField("Обновить действие пропска до", validators=[DataRequired("Заполните поле")])
     submit = SubmitField("Отправить")
 
 
 class NewTransportForm(FlaskForm):
-    vin = StringField("Номер автомобиля", validators=[DataRequired("Заполните поле")],
-                      description="Например: Е999КН77")
-    car_model = StringField("Марка автомобиля", validators=[DataRequired("Заполните поле")],
-                            description="Например: BMW, Honda, KIA и т.д.")
+    vin = StringField("Номер автомобиля", validators=[DataRequired("Заполните поле")])
+    car_model = StringField("Марка автомобиля", validators=[DataRequired("Заполните поле")])
     submit = SubmitField("Отправить")
 
 
@@ -42,15 +38,12 @@ class RegisterForm(FlaskForm):
                                     Email("Необходимо ввести электронную почту (например: example@email.com)")])
     password = PasswordField("Пароль",
                              validators=[DataRequired("Заполните поле"),
-                                         Length(min=6, max=16, message="Используйте минимум 6 символов.")],
-                             description="Используйте минимум 6 символов.")
+                                         Length(min=6, max=16, message="Используйте минимум 6 символов.")])
     repeat_password = PasswordField("Повторите пароль",
-                                    validators=[DataRequired("Заполните поле"),
-                                                EqualTo('password', "Пароли не совпадают")])
+                                    validators=[DataRequired("Заполните поле")])
     submit = SubmitField("Зарегистрироваться")
 
 
-# TODO: Make form for requesting password reset instead
 class ResetPasswordRequestForm(FlaskForm):
     email = StringField("Электронная почта",
                         validators=[DataRequired("Заполните поле"),
@@ -60,8 +53,7 @@ class ResetPasswordRequestForm(FlaskForm):
 
 class PasswordResetForm(FlaskForm):
     password = PasswordField("Пароль", validators=[DataRequired("Заполните поле"),
-                                                   Length(6, 16, "Используйте минимум 6 символов.")],
-                             description="Используйте минимум 6 символов.")
+                                                   Length(6, 16, "Используйте минимум 6 символов.")])
     repeat_password = PasswordField("Повторите пароль",
                                     validators=[DataRequired("Заполните поле"),
                                                 EqualTo('password', "Пароли не совпадают")])

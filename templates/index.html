@@ -1,20 +1,23 @@
 {% include "header.html" %}
 
 
-{% block content %}
-{% if not logged_in %}
 
-<div class="jumbotron">
-        <div class="container">
-          <h1 class="display-3">Добро пожаловать!</h1>
-          <p>Для получения информации о пропусках для въезда на территорию Новово 2,
-            пожалуйста, зарегистрируйтесь или войдите в личный кабинет.</p>
-          <p><a class="btn btn-primary" href="{{url_for('login')}}" role="button">Войти</a>
-          <a class="btn btn-secondary" href="{{url_for('register')}}" role="button">Регистрация</a></p>
-        </div>
-</div>
 
-{% else %}
+  <div class="px-4 py-5 my-5 text-center">
+    <h1 class="display-5 fw-bold">Pass tracker</h1>
+    <div class="col-lg-6 mx-auto">
+      <p class="lead mb-4">Удобный и быстрый способ контролировать доступ к проезду на частную территорию</p>
+      {% if not logged_in %}
+      <div class="d-grid gap-2 d-sm-flex justify-content-sm-center">
+        <a class="btn btn-dark btn-lg px-4 gap-3" href="{{url_for('login')}}" role="button">Вход</a>
+        <a class="btn btn-outline-secondary btn-lg px-4" href="{{url_for('register')}}" role="button">Регистрация</a>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+
+
+<!--
 
 <div class="container">
   <div class="row">
@@ -23,10 +26,10 @@
         <h3>Автомобили с временным пропуском</h3>
         <thead>
           <tr>
-            <th scope="col">Номер автомобиля</th>
+            <th scope="col">Номер</th>
             <th scope="col">Марка</th>
             <th scope="col">Участок</th>
-            <th scope="col">Действие пропуска</th>
+            <th scope="col">Действие</th>
             <th scope="col"></th>
             <th scope="col"></th>
           </tr>
@@ -44,8 +47,8 @@
             <td>до {{vehicle.expiry_date.strftime("%d-%m-%Y")}}</td>
             {% endif %}
             {% if id != 2 %}
-            <td><a href="{{url_for('update_pass', pass_id=vehicle.id) }}">↻</a></td>
-            <td><a href="{{url_for('delete_pass', pass_id=vehicle.id) }}">✗</a></td>
+            <td><a class="btn btn-outline-secondary btn-sm" role="button" href="{{url_for('update_pass', pass_id=vehicle.id) }}">↻</a></td>
+            <td><a class="btn btn-outline-danger btn-sm" role="button" href="{{url_for('delete_pass', pass_id=vehicle.id) }}">✗</a></td>
             {% else %}
             <td></td>
             <td></td>
@@ -84,7 +87,7 @@
             <td>{{vehicle.car_model}}</td>
             <td>{{vehicle.plot_number}}</td>
             {% if id != 2 %}
-            <td><a href="{{url_for('delete_transport', transport_id=vehicle.id) }}">✗</a></td>
+            <td><a class="btn btn-outline-danger btn-sm" role="button" href="{{url_for('delete_transport', transport_id=vehicle.id) }}">✗</a></td>
             {% else %}
             <td></td>
             {% endif %}
@@ -109,5 +112,5 @@
     <p class="mb-2">Пропуск действует до указанной даты включительно. Через 7 дней по его истечении пропуск автоматически удаляется из списка.</p>
   </div>
 
-{% endif %}
-{% endblock %}
+-->
+{% include "footer.html" %}

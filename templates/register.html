@@ -1,8 +1,40 @@
 {% import "bootstrap/wtf.html" as wtf %}
 {% include "header.html" %}
 
-{% block content %}
+<main class="form-fields my-5">
+    <form method="POST" action="{{url_for('register')}}">
+        {{ form.csrf_token() }}
+        <h2 class="h8 mb-3 fw-normal">Регистрация</h2>
 
+        {% if error %}
+            <p class=error> {{ error }}
+        {% endif %}
+
+        <div class="form-floating">
+            <div class="input-group">
+                {{ form.first_name(type='first_name', placeholder='Имя', class='form-control') }}
+                {{ form.last_name(type='first_name', placeholder='Фамилия', class='form-control') }}
+            </div>
+            <div class="form-group">
+                {{ form.email(type='email', placeholder='Электронная почта', class='form-control') }}
+                {{ form.plot_number(type='number', placeholder='Номер участка', class='form-control') }}
+                {{ form.password(type='password', placeholder='Пароль', class='form-control') }}
+                {{ form.repeat_password(type='password', novalidate=True, placeholder='Повторите пароль', class='form-control') }}
+<!--
+                {{ wtf.form_field(form.email, type='text', placeholder='name@example.com') }}
+                {{ wtf.form_field(form.plot_number, type='number', placeholder='Номер участка') }}
+                {{ wtf.form_field(form.password, type='password', placeholder='password') }}
+                {{ wtf.form_field(form.repeat_password, novalidate=True, type='password', placeholder='password') }}
+            -->
+            </div>
+            <div class="text-center">
+            <button type="submit" class="btn btn-secondary w-100 btn btn-lg">Зарегистрироваться</button>
+            </div>
+        </div>
+    </form>
+</main>
+
+<!--
   <div class="container">
     <h2>Регистрация</h2>
     <div class="row">
@@ -14,5 +46,6 @@
       </div>
     </div>
   </div>
+-->
 
-{% endblock %}
+{% include "footer.html" %}

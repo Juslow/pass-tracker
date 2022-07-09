@@ -1,0 +1,203 @@
+{% include "header.html" %}
+
+<!-- Test stuff-->
+
+
+<!-- col-lg-4 p-lg-5  pt-lg-3 p-3 -->
+<!-- p-4 pb-0 pe-lg-0 pt-lg-5  -->
+<div class="container my-5">
+  <div class="p-lg-4 row align-items-center rounded-3 border shadow-lg">
+    <div class="">
+     <!-- <h1 class="display-4 fw-bold lh-1">Автомобили с временным пропуском</h1>-->
+     {% if pass_list %}
+      <table class="table table-striped table-hover table-responsive align-middle">
+        <caption class="caption-top">Пропуска для сторонних транспортных средств</caption>
+        <caption>Пропуск действует до указанной даты включительно. Через 7 дней по его истечении пропуск автоматически удаляется из списка.</caption>
+        <thead class="">
+          <tr>
+            <th scope="col">Номер</th>
+            <th scope="col">Марка</th>
+            <th scope="col">Участок</th>
+            <th scope="col">Действие</th>
+            <th scope="col"></th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for vehicle in pass_list %}
+          {% if id == vehicle.plot_owner.id or id == 2 %}
+          <tr>
+            <td>{{vehicle.vin}}</td>
+            <td>{{vehicle.car_model}}</td>
+            <td>{{vehicle.plot_number}}</td>
+            {% if (vehicle.expiry_date - today).days < 0 %}
+            <td style="color: red">{{vehicle.expiry_date.strftime("%d-%m-%Y")}}</td>
+            {% else %}
+            <td>{{vehicle.expiry_date.strftime("%d-%m-%Y")}}</td>
+            {% endif %}
+            {% if id != 2 %}
+            <td><a class="btn btn-outline-secondary btn-sm" role="button" href="{{url_for('update_pass', pass_id=vehicle.id) }}">↻</a> <a class="btn btn-outline-danger btn-sm" role="button" href="{{url_for('delete_pass', pass_id=vehicle.id) }}">✗</a></td>
+            {% else %}
+            <td></td>
+            {% endif %}
+          </tr>
+          {% endif %}
+          {% endfor %}
+        </tbody>
+      </table>
+      {% else %}
+      <h1 class="display-4 fw-bold lh-1"></h1>
+      <p class="lead">Здесь будет отображаться информация о транспортных средствах, которым вы выдали пропуск.</p>
+      {% endif %}
+      <div class="d-grid gap-2 d-md-flex justify-content-md-start mb-4 mb-lg-3">
+        <a class="btn btn-secondary btn-lg px-4 me-md-2 fw-bold" href="{{url_for('new_pass')}}">Добавить</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- col-lg-4 p-lg-5  pt-lg-3 p-3 -->
+<!-- p-4 pb-0 pe-lg-0 pt-lg-5  -->
+<div class="container my-5">
+  <div class="p-lg-4 row align-items-center rounded-3 border shadow-lg">
+    <div class="">
+     <!-- <h1 class="display-4 fw-bold lh-1">Автомобили с временным пропуском</h1>-->
+     {% if transport_list %}
+     <table class="table table-striped table-hover table-responsive align-middle">
+      <caption class="caption-top">Личные транспортные средства</caption>
+      <!--
+      {% if id == 2 %}
+      <h3>Автомобили владельцев участков</h3>
+      {% else %}
+      <h3>Личные транспортные средства</h3>
+      {% endif %}
+      -->
+      <thead>
+        <tr>
+          <th scope="col">Номер автомобиля</th>
+          <th scope="col">Марка</th>
+          <th scope="col">Участок</th>
+          <th scope="col"></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for vehicle in transport_list %}
+        {% if id == vehicle.owner.id or id == 2 %}
+        <tr>
+          <td>{{vehicle.vin}}</td>
+          <td>{{vehicle.car_model}}</td>
+          <td>{{vehicle.plot_number}}</td>
+          {% if id != 2 %}
+          <td><a class="btn btn-outline-danger btn-sm" role="button" href="{{url_for('delete_transport', transport_id=vehicle.id) }}">✗</a></td>
+          {% else %}
+          <td></td>
+          {% endif %}
+        </tr>
+        {% endif %}
+        {% endfor %}
+      </tbody>
+    </table>
+    {% else %}  
+    <h1 class="display-4 fw-bold lh-1"></h1>
+    <p class="lead">Здесь будет отображаться информация о ваших личных транспортных средствах.</p>
+    {% endif %}
+      <div class="d-grid gap-2 d-md-flex justify-content-md-start mb-4 mb-lg-3">
+        <a class="btn btn-secondary btn-lg px-4 me-md-2 fw-bold" href="{{url_for('add_transport')}}">Добавить</a>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- Test stuff-->
+
+
+<!-- Previous version -->
+<!--
+<div class="container">
+  <div class="row">
+    <div  class="col-md-6">
+      <table class="table table-striped table-hover">
+        <h3>Автомобили с временным пропуском</h3>
+        <thead>
+          <tr>
+            <th scope="col">Номер</th>
+            <th scope="col">Марка</th>
+            <th scope="col">Участок</th>
+            <th scope="col">Действие</th>
+            <th scope="col"></th>
+            <th scope="col"></th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for vehicle in pass_list %}
+          {% if id == vehicle.plot_owner.id or id == 2 %}
+          <tr>
+            <td>{{vehicle.vin}}</td>
+            <td>{{vehicle.car_model}}</td>
+            <td>{{vehicle.plot_number}}</td>
+            {% if (vehicle.expiry_date - today).days < 0 %}
+            <td style="color: red">до {{vehicle.expiry_date.strftime("%d-%m-%Y")}}</td>
+            {% else %}
+            <td>до {{vehicle.expiry_date.strftime("%d-%m-%Y")}}</td>
+            {% endif %}
+            {% if id != 2 %}
+            <td><a class="btn btn-outline-secondary btn-sm" role="button" href="{{url_for('update_pass', pass_id=vehicle.id) }}">↻</a></td>
+            <td><a class="btn btn-outline-danger btn-sm" role="button" href="{{url_for('delete_pass', pass_id=vehicle.id) }}">✗</a></td>
+            {% else %}
+            <td></td>
+            <td></td>
+            {% endif %}
+          </tr>
+          {% endif %}
+          {% endfor %}
+        </tbody>
+      </table>
+      {% if id != 2 %}
+      <div class="clearfix">
+          <a class="btn btn-primary float-right" href="{{url_for('new_pass')}}">Новый пропуск</a>
+      </div>
+      {% endif %}
+    </div>
+    <div  class="col-md-6">
+      <table class="table table-striped table-hover">
+        {% if id == 2 %}
+        <h3>Автомобили владельцев участков</h3>
+        {% else %}
+        <h3>Личные транспортные средства</h3>
+        {% endif %}
+        <thead>
+          <tr>
+            <th scope="col">Номер автомобиля</th>
+            <th scope="col">Марка</th>
+            <th scope="col">Участок</th>
+            <th scope="col"></th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for vehicle in transport_list %}
+          {% if id == vehicle.owner.id or id == 2 %}
+          <tr>
+            <td>{{vehicle.vin}}</td>
+            <td>{{vehicle.car_model}}</td>
+            <td>{{vehicle.plot_number}}</td>
+            {% if id != 2 %}
+            <td><a class="btn btn-outline-danger btn-sm" role="button" href="{{url_for('delete_transport', transport_id=vehicle.id) }}">✗</a></td>
+            {% else %}
+            <td></td>
+            {% endif %}
+          </tr>
+          {% endif %}
+          {% endfor %}
+        </tbody>
+      </table>
+      {% if id != 2 %}
+      <div class="clearfix">
+          <a class="btn btn-primary float-right" href="{{url_for('add_transport')}}">Добавить личный транспорт</a>
+      </div>
+      {% endif %}
+    </div>
+    </div>
+
+  </div>
+</div>
+-->
+
+{% include "footer.html" %}

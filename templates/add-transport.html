@@ -1,6 +1,7 @@
 {% import "bootstrap/wtf.html" as wtf %}
 {% include "header.html" %}
 
+<!--
 {% block content %}
 
   <div class="container">
@@ -12,3 +13,24 @@
   </div>
 
 {% endblock %}
+-->
+<main class="form-fields my-5">
+  <form method="POST" action="{{url_for('add_transport')}}">
+    {{ form.csrf_token() }}
+    <h2 class="h3 mb-3 fw-normal">Добавить личный транспорт</h2>
+    {% if error %}
+      <p class=error> {{ error }}
+    {% endif %}
+    <div class="form-floating">
+      <div class="form-group">
+        {{ wtf.form_field(form.vin, type='text', class='form-control', placeholder='Например: Е999КН') }}
+        {{ wtf.form_field(form.car_model, type='text', class='form-control', placeholder='Например: BMW, Honda, KIA и т.д.') }}
+      </div>
+    </div>
+    <div class="text-center">
+      <button type="submit" class="btn btn-secondary w-100 btn btn-lg">Добавить</button>
+    </div>
+  </form>
+</main>
+
+{% include "footer.html" %}

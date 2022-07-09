@@ -37,7 +37,6 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 Bootstrap(app)
 
-
 # TODO: Connect PostgreSQL
 
 
@@ -67,11 +66,11 @@ class User(UserMixin, db.Model):
     @staticmethod
     def verify_reset_password_token(token):
         try:
-            id = jwt.decode(token, app.config['SECRET_KEY'],
-                            algorithms=['HS256'])['reset_password']
+            user_id = jwt.decode(token, app.config['SECRET_KEY'],
+                                 algorithms=['HS256'])['reset_password']
         except:
             return
-        return User.query.get(id)
+        return User.query.get(user_id)
 
 
 class PersonalTransport(db.Model):
@@ -147,6 +146,23 @@ def home():
                            today=date.today())
 
 
+@app.route("/transport-list", methods=["GET", "POST"])
+def transport_list():
+    delete_outdated_data(expire_time=7)
+    vehicles_pass_list = PassTransport.query.all()
+    personal_transport_list = PersonalTransport.query.all()
+    if current_user.is_authenticated:
+        user_id = int(current_user.get_id())
+    else:
+        user_id = None
+    return render_template("transport-list.html",
+                           pass_list=vehicles_pass_list,
+                           transport_list=personal_transport_list,
+                           logged_in=current_user.is_authenticated,
+                           id=user_id,
+                           today=date.today())
+
+
 @app.route("/new-pass", methods=["GET", "POST"])
 def new_pass():
     error = None
@@ -157,30 +173,39 @@ def new_pass():
         # Variable expiry_date is datetime.date type
         new_expiry_date = form.validation_period.data
         pass_transport = PassTransport.query.filter_by(vin=new_vin).first()
+        personal_transport = PersonalTransport.query.filter_by(vin=new_vin).first()
         if pass_transport:
-            error = f"У данного автомобиля уже есть пропуск до {pass_transport.expiry_date.strftime('%d-%m-%Y')}."
+            error = f"У данного автомобиля уже есть пропуск до {pass_transport.expiry_date.strftime('%d-%m-%Y')}"
+        elif personal_transport:
+            error = f"Данный автомобиль уже добален в список личных транспортных средаств"
         else:
             plot_n = User.query.get(current_user.get_id()).plot_number
             new_pass_transport = PassTransport(vin=new_vin, car_model=new_car_model,
                                                plot_number=plot_n, expiry_date=new_expiry_date)
             db.session.add(new_pass_transport)
             db.session.commit()
-            return redirect(url_for("home"))
+            return redirect(url_for("transport_list"))
     return render_template("new-pass.html", form=form, logged_in=current_user.is_authenticated, error=error)
 
 
 @app.route("/add-transport", methods=["GET", "POST"])
 def add_transport():
+    error = None
     form = NewTransportForm()
     if form.validate_on_submit():
         new_vin = form.vin.data.upper()
         new_car_model = form.car_model.data.upper()
         plot_n = User.query.get(current_user.get_id()).plot_number
-        new_transport = PersonalTransport(vin=new_vin, car_model=new_car_model, plot_number=plot_n)
-        db.session.add(new_transport)
-        db.session.commit()
-        return redirect(url_for("home"))
-    return render_template("add-transport.html", form=form, logged_in=current_user.is_authenticated)
+
+        personal_transport = PersonalTransport.query.filter_by(vin=new_vin).first()
+        if personal_transport:
+            error = f"Транспорт с таким номером уже добавлен"
+        else:
+            new_transport = PersonalTransport(vin=new_vin, car_model=new_car_model, plot_number=plot_n)
+            db.session.add(new_transport)
+            db.session.commit()
+            return redirect(url_for("transport_list"))
+    return render_template("add-transport.html", form=form, logged_in=current_user.is_authenticated, error=error)
 
 
 @app.route("/login", methods=["GET", "POST"])
@@ -196,7 +221,7 @@ def login():
             error = "Такого логина не существует, пожалуйста, попробуйте еще раз."
         elif check_password_hash(user.password, password):
             login_user(user)
-            return redirect(url_for("home"))
+            return redirect(url_for("transport_list"))
         else:
             error = "Неверный пароль, попробуйте еще раз."
     return render_template("login.html", form=form, error=error, logged_in=current_user.is_authenticated)
@@ -216,6 +241,8 @@ def register():
             error = 'Для данного участка уже имеется личный кабинет, пожалуйста, нажмите кнопку "войти".'
         elif email_in_use:
             error = "Данный логин уже используется, пожалуйста, придумайте новый."
+        elif register_form.password.data != register_form.repeat_password.data:
+            error = "Пароли не совпадают"
         else:
             new_user = User(first_name=register_form.first_name.data.title(),
                             last_name=register_form.last_name.data.title(),
@@ -264,7 +291,7 @@ def reset_password(token):
         db.session.commit()
         flash("Пароль успешно обновлен")
         return redirect(url_for('login'))
-    return render_template('reset-password.html', form=form)
+    return render_template('reset-password.html', token=token, form=form)
 
 
 @app.route('/update/<int:pass_id>', methods=["GET", "POST"])
@@ -274,8 +301,8 @@ def update_pass(pass_id):
     if update_form.validate_on_submit():
         pass_to_update.expiry_date = update_form.validation_period.data
         db.session.commit()
-        return redirect(url_for('home'))
-    return render_template('update-pass.html', form=update_form,
+        return redirect(url_for('transport_list'))
+    return render_template('update-pass.html', pass_id=pass_id, form=update_form, pass_to_update=pass_to_update,
                            logged_in=current_user.is_authenticated)
 
 
@@ -284,7 +311,7 @@ def delete_pass(pass_id):
     pass_to_delete = PassTransport.query.get(pass_id)
     db.session.delete(pass_to_delete)
     db.session.commit()
-    return redirect(url_for('home'))
+    return redirect(url_for('transport_list'))
 
 
 @app.route('/delete-transport/<int:transport_id>')
@@ -292,7 +319,7 @@ def delete_transport(transport_id):
     transport_to_delete = PersonalTransport.query.get(transport_id)
     db.session.delete(transport_to_delete)
     db.session.commit()
-    return redirect(url_for('home'))
+    return redirect(url_for('transport_list'))
 
 
 @app.route('/logout')

@@ -1,3 +1,16 @@
 .error{
     color: #a94442;
 }
+
+.help-block{
+    color: #a
+    94442;
+}
+
+.form-control {
+  height: 50px;
+}
+
+a {
+    color: grey;
+}
