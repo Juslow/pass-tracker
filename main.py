@@ -156,6 +156,7 @@ def transport_list():
     else:
         user_id = None
     return render_template("transport-list.html",
+                           current_user=current_user,
                            pass_list=vehicles_pass_list,
                            transport_list=personal_transport_list,
                            logged_in=current_user.is_authenticated,
@@ -240,9 +241,9 @@ def register():
         if user:
             error = 'Для данного участка уже имеется личный кабинет, пожалуйста, нажмите кнопку "войти".'
         elif email_in_use:
-            error = "Данный логин уже используется, пожалуйста, придумайте новый."
+            error = 'Данная почта уже используется, пожалуйста, нажмите кнопку "войти".'
         elif register_form.password.data != register_form.repeat_password.data:
-            error = "Пароли не совпадают"
+            error = 'Пароли не совпадают'
         else:
             new_user = User(first_name=register_form.first_name.data.title(),
                             last_name=register_form.last_name.data.title(),
