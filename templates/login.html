@@ -1,11 +1,12 @@
 {% import "bootstrap/wtf.html" as wtf %}
 {% include "header.html" %}
 
-<main class="form-signin my-5">
+
+<main class="form-signin my-5 py-5">
     <form method="POST" action="{{url_for('login')}}">
         {{ form.csrf_token() }}
-        <h2 class="h3 mb-3 fw-normal">Вход в личной кабинет</h2>
 
+        <h2 class="h3 mb-3 fw-normal">Вход в личной кабинет</h2>
         {% if error %}
             <p class=error> {{ error }}
         {% endif %}
@@ -13,8 +14,8 @@
 
         <div class="form-floating">
             <div class="form-group">
-                {{ form.email(type='email', placeholder='Электронная почта', class='form-control') }}
-                {{ form.password(type='password', placeholder='Пароль', class='form-control') }}
+                {{ form.email(type='email', placeholder='Электронная почта', class='form-control', novalidate='True') }}
+                {{ form.password(type='password', placeholder='Пароль', class='form-control', novalidate=True) }}
                 <!--
                 {{ wtf.form_field(form.email, type='email', id='floatingInput', class='form-control', placeholder='name@example.com') }}
                 {{ wtf.form_field(form.password, type='password', class='form-control', placeholder='password') }} -->
@@ -22,12 +23,16 @@
         </div>
         <div class="text-center">
             <button type="submit" class="btn btn-secondary w-100 btn btn-lg">Войти</button>
-
-            <p>
+            <p class="my-4">
                 Забыли пароль?
                 <a href="{{url_for('reset_password_request')}}">Нажмите здесь, чтобы восстановить</a>
             </p>
+            <p class="my-2">
+              Если вы еще не зарегистрировались, то
+              <a href="{{url_for('register')}}">нажмите здесь</a>
+            </p>
         </div>
+        
     </form>
 </main>
 <!--
