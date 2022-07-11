@@ -369,7 +369,7 @@ def register():
             db.session.add(new_user)
             db.session.commit()
             send_email_confirm_email(new_user)
-            flash('На почту выслано письмо для подтверждения электронной почты. Если не видите письма, проверьте '
+            flash('На почту выслано письмо с инструкциями для завершения регистрации. Если не видите письма, проверьте '
                   'папку "спам"')
             return redirect(url_for("login"))
     return render_template("register.html", form=register_form,
