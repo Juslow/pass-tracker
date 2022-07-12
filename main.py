@@ -43,8 +43,8 @@ uri = os.getenv("DATABASE_URL")  # or other relevant config var
 if uri.startswith("postgres://"):
     uri = uri.replace("postgres://", "postgresql://", 1)
 # rest of connection code using the connection string `uri`
-
 app.config['SQLALCHEMY_DATABASE_URI'] = uri
+# app.config['SQLALCHEMY_DATABASE_URI'] = "sqlite:///car-pass.db"
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 
@@ -184,6 +184,13 @@ def security_only(f):
     return decorated_function
 
 
+def add_novovo2_settlement():
+    if not Settlement.query.all():
+        settlement = Settlement(name='СНТ "Новово-2"')
+        db.session.add(settlement)
+        db.session.commit()
+
+
 def create_admin():
     if not User.query.get(1):
         user = User(first_name='Admin',
@@ -253,6 +260,7 @@ def load_user(user_id):
     return User.query.get(user_id)
 
 
+add_novovo2_settlement()
 create_admin()
 create_security_account()
 # ---------------------Web routes-----------------------
