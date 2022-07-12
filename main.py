@@ -109,7 +109,7 @@ class UnconfirmedUser(db.Model):
     settlement_id = Column(Integer, nullable=False)
     time_msg_sent = Column(DateTime, nullable=False)
 
-    def get_confirm_email_token(self, expires_in=600):
+    def get_confirm_email_token(self, expires_in=300):
         return jwt.encode(
             {'confirm_email': self.id, 'exp': time() + expires_in},
             app.config['SECRET_KEY'], algorithm='HS256')
@@ -226,7 +226,7 @@ def delete_outdated_data(expire_time):
             db.session.delete(taxi)
             db.session.commit()
     for user in unconfirmed_users:
-        if dt.datetime.now().minute - user.time_msg_sent.minute > 15:
+        if dt.datetime.now().minute - user.time_msg_sent.minute > 5:
             db.session.delete(user)
             db.session.commit()
 
@@ -379,6 +379,7 @@ def login():
 
 @app.route("/register", methods=["GET", "POST"])
 def register():
+    delete_outdated_data(expire_time=7)
     error = None
     register_form = RegisterForm()
     if register_form.validate_on_submit():
@@ -405,8 +406,8 @@ def register():
             db.session.add(new_user)
             db.session.commit()
             send_email_confirm_email(new_user)
-            flash('На почту выслано письмо с инструкциями для завершения регистрации. Если не видите письма, проверьте '
-                  'папку "спам"')
+            flash('На почту выслано письмо с инструкциями для завершения регистрации. Оно активно в течение 5 минут. '
+                  'Если не видите письма, проверьте папку "спам"')
             return redirect(url_for("login"))
     return render_template("register.html", form=register_form,
                            error=error, logged_in=current_user.is_authenticated)
@@ -418,10 +419,9 @@ def confirm_email(token):
         return redirect(url_for('home'))
     unconfirmed_user = UnconfirmedUser.verify_confirm_email_token(token)
     if not unconfirmed_user:
-        print('No result')
+        flash('Высланный токен больше не активен, пожалуйста, попробуйте зарегистрироваться снова')
         return redirect(url_for('home'))
     else:
-        print('should work')
         confirmed_user = User(first_name=unconfirmed_user.first_name,
                               last_name=unconfirmed_user.last_name,
                               settlement_id=unconfirmed_user.settlement_id,
@@ -517,11 +517,12 @@ def logout():
 @app.route('/admin', methods=['GET', 'POST'])
 @admin_only
 def admin():
+    unconfirmed_users = UnconfirmedUser.query.all()
     users = User.query.all()
     temporary_passes = TemporaryPass.query.all()
     permanent_passes = PermanentPass.query.all()
     taxi_passes = TaxiPass.query.all()
-    return render_template('admin.html', users=users,
+    return render_template('admin.html', users=users, unconfirmed_users=unconfirmed_users,
                            temporary_passes=temporary_passes, permanent_passes=permanent_passes,
                            taxi_passes=taxi_passes, today=date.today(),
                            logged_in=current_user.is_authenticated)
