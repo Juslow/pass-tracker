@@ -55,7 +55,7 @@
           </tr>
         </thead>
         <tbody>
-          {% for user in unconfirmed_users[1::] %}
+          {% for user in unconfirmed_users %}
           <tr>
             <td>{{user.id}}</td>
             <td>{{user.first_name}}</td>
@@ -63,7 +63,6 @@
             <td>{{user.plot_number}}</td>
             <td>{{user.email}}</td>
             <td>{{user.time_msg_sent}}</td>
-            <td><a class="btn btn-outline-danger btn-sm" role="button" href="{{url_for('delete_user', user_id=user.id) }}">✗</a></td>
           </tr>
           {% endfor %}
         </tbody>
