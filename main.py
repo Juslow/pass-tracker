@@ -34,7 +34,12 @@ app.config['MAIL_USERNAME'] = os.environ.get('MAIL_USERNAME')
 app.config['MAIL_DEFAULT_SENDER'] = os.environ.get('MAIL_DEFAULT_SENDER')
 app.config['MAIL_PASSWORD'] = os.environ.get('MAIL_PASSWORD')
 
-app.config['SQLALCHEMY_DATABASE_URI'] = "sqlite:///car-pass.db"
+app.config['ADMIN_MAIL'] = os.environ.get('ADMIN_MAIL')
+app.config['ADMIN_PASSWORD'] = os.environ.get('ADMIN_PASSWORD')
+app.config['SECURITY_MAIL'] = os.environ.get('SECURITY_MAIL')
+app.config['SECURITY_PASSWORD'] = os.environ.get('SECURITY_PASSWORD')
+
+app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get("DATABASE_URL", "sqlite:///car-pass.db")
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
@@ -60,9 +65,9 @@ class Settlement(db.Model):
 class User(UserMixin, db.Model):
     __tablename__ = "users"
     id = Column(Integer, primary_key=True)
-    plot_number = Column(String(100), nullable=False)
-    first_name = Column(String(100), nullable=False)
-    last_name = Column(String(100), nullable=False)
+    plot_number = Column(String(100))
+    first_name = Column(String(100))
+    last_name = Column(String(100))
     email = Column(String(255), unique=True, nullable=False)
     password = Column(String(255), nullable=False)
 
@@ -173,6 +178,24 @@ def security_only(f):
     return decorated_function
 
 
+def create_admin():
+    if not User.query.get(1):
+        user = User(first_name='Admin',
+                    email=app.config['ADMIN_MAIL'],
+                    password=generate_password_hash('password', 'pbkdf2:sha256', 8))
+        db.session.add(user)
+        db.session.commit()
+
+
+def create_security_account():
+    if not User.query.get(2):
+        user = User(first_name='Security',
+                    email=app.config['SECURITY_MAIL'],
+                    password=generate_password_hash('password', 'pbkdf2:sha256', 8))
+        db.session.add(user)
+        db.session.commit()
+
+
 def delete_outdated_data(expire_time):
     """Deletes outdated transport passes in defined expire time (days)."""
     today = date.today()
@@ -181,7 +204,7 @@ def delete_outdated_data(expire_time):
     temporary_passes = TemporaryPass.query.all()
     for transport in temporary_passes:
         expiry_date = transport.expiry_date
-        if (expiry_date - today).days > expire_time:
+        if today.day - expiry_date.day > expire_time:
             db.session.delete(transport)
             db.session.commit()
     for taxi in taxi_list:
@@ -224,6 +247,8 @@ def load_user(user_id):
     return User.query.get(user_id)
 
 
+create_admin()
+create_security_account()
 # ---------------------Web routes-----------------------
 @app.route("/")
 def home():
@@ -347,12 +372,9 @@ def register():
         hash_and_salted_password = generate_password_hash(register_form.password.data,
                                                           'pbkdf2:sha256',
                                                           8)
-        user = User.query.filter_by(plot_number=register_form.plot_number.data).first()
         email_in_use = User.query.filter_by(email=register_form.email.data).first()
         email_in_use2 = UnconfirmedUser.query.filter_by(email=register_form.email.data).first()
-        if user:
-            error = 'Для данного участка уже имеется личный кабинет, пожалуйста, нажмите кнопку "войти".'
-        elif email_in_use:
+        if email_in_use:
             error = 'Данная почта уже используется, пожалуйста, нажмите кнопку "войти".'
         elif email_in_use2:
             error = 'Вам на почту уже отправлены инструкции для завершения регистрации.'
