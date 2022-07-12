@@ -217,7 +217,7 @@ def delete_outdated_data(expire_time):
     temporary_passes = TemporaryPass.query.all()
     for transport in temporary_passes:
         expiry_date = transport.expiry_date
-        if today.day - expiry_date.day > expire_time:
+        if (today - expiry_date).day > expire_time:
             db.session.delete(transport)
             db.session.commit()
     for taxi in taxi_list:
@@ -226,7 +226,7 @@ def delete_outdated_data(expire_time):
             db.session.delete(taxi)
             db.session.commit()
     for user in unconfirmed_users:
-        if dt.datetime.now().minute - user.time_msg_sent.minute > 5:
+        if (dt.datetime.now() - user.time_msg_sent).minute > 5:
             db.session.delete(user)
             db.session.commit()
 
