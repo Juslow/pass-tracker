@@ -1,5 +1,97 @@
 {% include "header.html" %}
 
+<!-- Temporary Passes -->
+<div class="px-4">
+  
+  <ol class="list-group">
+    <h3 class="display-6">Временные пропуска</h3>
+    {% for vehicle in temporary_passes %}
+    <li class="list-group-item d-flex justify-content-between align-items-start list-group-item-outline-primary">
+      <div class="ms-2 me-auto">
+        <div class="fw-bold">{{vehicle.car_model}} {{vehicle.vin}}</div> 
+
+        <!-- Dropdown button -->
+        
+          <button type="button" class="btn btn-sm btn-link dropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown" aria-expanded="false">
+            <span class="visually-hidden">Toggle Dropdown</span>
+          </button>
+        
+          <ul class="dropdown-menu dropdown-menu-dark" aria-labelledby="dropdownMenuLink">
+            <li><a class="dropdown-item" href="{{url_for('update_pass', pass_id=vehicle.id) }}">Обновить</a></li>
+            <li><a class="dropdown-item" href="{{url_for('delete_pass', pass_id=vehicle.id) }}">Удалить</a></li>
+          </ul>
+        
+        <!-- Dropdown button -->
+        активен до {{vehicle.expiry_date.strftime("%d-%m-%Y")}}
+      </div>
+      <span class="badge bg-primary rounded-pill">{{vehicle.plot_owner.plot_number}}</span>
+
+      
+    </li>
+    {% endfor %}
+  </ol>
+</div>
+<!-- Temporary Passes -->
+
+<!-- Taxi Passes -->
+<div class="px-4">
+  <ol class="list-group">
+    <h3 class="display-6">Такси</h3>
+    {% for vehicle in taxi_passes %}
+    <li class="list-group-item d-flex justify-content-between align-items-start list-group-item-outline-warning">
+      <div class="ms-2 me-auto">
+        <div class="fw-bold">ТАКСИ {{vehicle.car_model}} {{vehicle.vin}} {{vehicle.color}}</div> 
+
+        <!-- Dropdown button -->
+        
+          <button type="button" class="btn btn-sm btn-link dropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown" aria-expanded="false">
+            <span class="visually-hidden">Toggle Dropdown</span>
+          </button>
+        
+          <ul class="dropdown-menu dropdown-menu-dark" aria-labelledby="dropdownMenuLink">
+            <li><a class="dropdown-item" href="{{url_for('delete_taxi', taxi_id=vehicle.id) }}">Удалить</a></li>
+          </ul>
+          Приедет с {{vehicle.access_time - 2}}:00 до {{vehicle.access_time}}:00
+        <!-- Dropdown button -->
+      </div>
+      <span class="badge bg-warning rounded-pill">{{vehicle.plot_owner.plot_number}}</span>
+      
+    </li>
+    {% endfor %}
+  </ol>
+</div>
+<!-- Taxi Passes -->
+
+<!-- Permanent Passes -->
+<div class="px-4">
+  <ol class="list-group">  
+  <h3 class="display-6">Постоянные пропуска</h3>
+    {% for vehicle in permanent_passes %}
+    <li class="list-group-item d-flex justify-content-between align-items-start list-group-item-outline-success">
+      <div class="ms-2 me-auto">
+        <div class="fw-bold">{{vehicle.car_model}} {{vehicle.vin}}</div> 
+
+        <!-- Dropdown button -->
+        
+          <button type="button" class="btn btn-sm btn-link dropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown" aria-expanded="false">
+            <span class="visually-hidden">Toggle Dropdown</span>
+          </button>
+        
+          <ul class="dropdown-menu dropdown-menu-dark" aria-labelledby="dropdownMenuLink">
+            <li><a class="dropdown-item" href="{{url_for('delete_transport', transport_id=vehicle.id) }}">Удалить</a></li>
+          </ul>
+        
+        <!-- Dropdown button -->
+      </div>
+      <span class="badge bg-success rounded-pill">{{vehicle.owner.plot_number}}</span>
+      
+    </li>
+    {% endfor %}
+  </ol>
+</div>
+<!-- Permanent Passes -->
+
+
 <div class="container my-5" style="max-width: 900px">
   <div class="p-lg-4 row align-items-center rounded-3 border shadow-lg">
     <div class="">
@@ -40,7 +132,7 @@
     <div class="">
      <!-- <h1 class="display-4 fw-bold lh-1">Автомобили с временным пропуском</h1>-->
       <table class="table table-striped table-hover table-responsive align-middle">
-        <caption class="caption-top">Пользователи</caption>
+        <caption class="caption-top">Пользователи, не подтвердившие учетную запись</caption>
         <thead class="">
           <tr>
             <th scope="col">id</th>
@@ -71,106 +163,6 @@
   </div>
 </div>
 
-<div class="container my-5" style="max-width: 900px">
-    <div class="p-lg-4 row align-items-center rounded-3 border shadow-lg">
-      <div class="">
-       <!-- <h1 class="display-4 fw-bold lh-1">Автомобили с временным пропуском</h1>-->
-        <table class="table table-striped table-hover table-responsive align-middle">
-          <caption class="caption-top">Временный пропуск</caption>
-          <caption>Пропуск действует до указанной даты включительно.</caption>
-          <thead class="">
-            <tr>
-              <th scope="col">Номер</th>
-              <th scope="col">Марка</th>
-              <th scope="col">Участок</th>
-              <th scope="col">Действие</th>
-              <!--
-              <th scope="col"></th>
-              -->
-            </tr>
-          </thead>
-          <tbody>
-            {% for vehicle in temporary_passes %}
-            <tr>
-              <td>{{vehicle.vin}}</td>
-              <td>{{vehicle.car_model}}</td>
-              <td>{{vehicle.plot_owner.plot_number}}</td>
-              {% if (vehicle.expiry_date - today).days < 0 %}
-              <td style="color: red">до {{vehicle.expiry_date.strftime("%d-%m-%Y")}}</td>
-              {% else %}
-              <td>до {{vehicle.expiry_date.strftime("%d-%m-%Y")}}</td>
-              {% endif %}             
-              <td><a class="btn btn-outline-secondary btn-sm" role="button" href="{{url_for('update_pass', pass_id=vehicle.id) }}">↻</a> <a class="btn btn-outline-danger btn-sm" role="button" href="{{url_for('delete_pass', pass_id=vehicle.id) }}">✗</a></td>
-            </tr>
-            {% endfor %}
-          </tbody>
-        </table>
-      </div>
-    </div>
-  </div>
-
-<div class="container my-5" style="max-width: 900px">
-  <div class="p-lg-4 row align-items-center rounded-3 border shadow-lg">
-    <div class="">
-     <!-- <h1 class="display-4 fw-bold lh-1">Автомобили с временным пропуском</h1>-->
-     
-     <table class="table table-striped table-hover table-responsive align-middle">
-      <caption class="caption-top">Постоянный пропуск</caption>
-      <thead>
-        <tr>
-          <th scope="col">Номер</th>
-          <th scope="col">Марка</th>
-          <th scope="col">Участок</th>
-          <th scope="col"></th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for vehicle in permanent_passes %}
-        <tr>
-          <td>{{vehicle.vin}}</td>
-          <td>{{vehicle.car_model}}</td>
-          <td>{{vehicle.owner.plot_number}}</td>
-          <td><a class="btn btn-outline-danger btn-sm" role="button" href="{{url_for('delete_transport', transport_id=vehicle.id) }}">✗</a></td>
-        </tr>
-        {% endfor %}
-      </tbody>
-    </table>
-    </div>
-  </div>
-</div>
-
-
-<div class="container my-5" style="max-width: 900px">
-  <div class="p-lg-4 row align-items-center rounded-3 border shadow-lg">
-    <div class="">
-     <!-- <h1 class="display-4 fw-bold lh-1">Автомобили с временным пропуском</h1>-->
-     
-     <table class="table table-striped align-middle">
-      <caption class="caption-top">Такси</caption>
-      <thead>
-        <tr>
-          <th scope="col"></th>
-          <th scope="col">Участок</th>
-          <th scope="col">Время</th>
-          <th scope="col">Описание</th>
-          <th></th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for vehicle in taxi_passes %}
-        <tr>
-          <td>Такси</td>
-          <td>{{vehicle.plot_owner.plot_number}}</td>
-          <td>{{vehicle.access_time - 2}}:00 - {{vehicle.access_time}}:00</td>
-          <td>{{vehicle.car_model}} {{vehicle.vin}} {{vehicle.description}}</td>
-          <td><a class="btn btn-outline-danger btn-sm" role="button" href="{{url_for('delete_taxi', taxi_id=vehicle.id) }}">✗</a></td>
-        </tr>
-        {% endfor %}
-      </tbody>
-    </table>
-    </div>
-  </div>
-</div>
 
 
 

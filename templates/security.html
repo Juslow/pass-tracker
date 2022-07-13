@@ -10,6 +10,7 @@
     <!-- Custom styles for this template -->
     <link href="{{ url_for('static', filename='css/styles.css')}}" rel="stylesheet">
     <link href="{{ url_for('static', filename='css/forms.css')}}" rel="stylesheet">
+    <link href="{{ url_for('static', filename='css/list-groups.css')}}" rel="stylesheet">
       <title>Pass Tracker</title>
   </head>
 
@@ -39,103 +40,71 @@
         </div>
     </nav>
 
+<div class="px-4 py-5 my-5 text-center">
+  <h1 class="display-5 fw-bold">СНТ "Новово-2"</h1>
+  <div class="col-lg-6 mx-auto">
+    <p class="lead mb-4"></p>
+  </div>
+</div>
 
-<div class="container my-5" style="max-width: 900px">
-    <div class="p-lg-4 row align-items-center rounded-3 border shadow-lg">
-      <div class="">
-       <!-- <h1 class="display-4 fw-bold lh-1">Автомобили с временным пропуском</h1>-->
-        <table class="table table-striped table-hover table-responsive align-middle">
-          <caption class="caption-top">Временный пропуск</caption>
-          <caption>Пропуск действует до указанной даты включительно.</caption>
-          <thead class="">
-            <tr>
-              <th scope="col">Номер</th>
-              <th scope="col">Марка</th>
-              <th scope="col">Участок</th>
-              <th scope="col">Действие</th>
-              <!--
-              <th scope="col"></th>
-              -->
-            </tr>
-          </thead>
-          <tbody>
-            {% for vehicle in temporary_passes %}
-            <tr>
-              <td>{{vehicle.vin}}</td>
-              <td>{{vehicle.car_model}}</td>
-              <td>{{vehicle.plot_owner.plot_number}}</td>
-              {% if (vehicle.expiry_date - today).days < 0 %}
-              <td style="color: red">до {{vehicle.expiry_date.strftime("%d-%m-%Y")}}</td>
-              {% else %}
-              <td>до {{vehicle.expiry_date.strftime("%d-%m-%Y")}}</td>
-              {% endif %}             
-            </tr>
-            {% endfor %}
-          </tbody>
-        </table>
+<!-- Temporary Passes -->
+{% if temporary_passes %}
+<div class="px-4">
+  
+  <ol class="list-group">
+    <h3 class="display-6">Временные пропуска</h3>
+    {% for vehicle in temporary_passes %}
+    <li class="list-group-item d-flex justify-content-between align-items-start list-group-item-outline-primary">
+      <div class="ms-2 me-auto">
+        <div class="fw-bold">{{vehicle.car_model}} {{vehicle.vin}}</div> 
+        активен до {{vehicle.expiry_date.strftime("%d-%m-%Y")}}
       </div>
-    </div>
-  </div>
+      <span class="badge bg-primary rounded-pill">{{vehicle.plot_owner.plot_number}}</span>
 
-<div class="container my-5" style="max-width: 900px">
-  <div class="p-lg-4 row align-items-center rounded-3 border shadow-lg">
-    <div class="">
-     <!-- <h1 class="display-4 fw-bold lh-1">Автомобили с временным пропуском</h1>-->
-     
-     <table class="table table-striped table-hover table-responsive align-middle">
-      <caption class="caption-top">Постоянный пропуск</caption>
-      <thead>
-        <tr>
-          <th scope="col">Номер</th>
-          <th scope="col">Марка</th>
-          <th scope="col">Участок</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for vehicle in permanent_passes %}
-        <tr>
-          <td>{{vehicle.vin}}</td>
-          <td>{{vehicle.car_model}}</td>
-          <td>{{vehicle.owner.plot_number}}</td>
-        </tr>
-        {% endfor %}
-      </tbody>
-    </table>
-    </div>
-  </div>
+      
+    </li>
+    {% endfor %}
+  </ol>
 </div>
+{% endif %}
+<!-- Temporary Passes -->
 
-
-<div class="container my-5" style="max-width: 900px">
-  <div class="p-lg-4 row align-items-center rounded-3 border shadow-lg">
-    <div class="">
-     <!-- <h1 class="display-4 fw-bold lh-1">Автомобили с временным пропуском</h1>-->
-     
-     <table class="table table-striped align-middle">
-      <caption class="caption-top">Такси</caption>
-      <thead>
-        <tr>
-          <th scope="col"></th>
-          <th scope="col">Участок</th>
-          <th scope="col">Время</th>
-          <th scope="col">Описание</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for vehicle in taxi_passes %}
-        <tr>
-          <td>Такси</td>
-          <td>{{vehicle.plot_owner.plot_number}}</td>
-          <td>{{vehicle.access_time - 2}}:00 - {{vehicle.access_time}}:00</td>
-          <td>{{vehicle.car_model}} {{vehicle.vin}} {{vehicle.description}}</td>
-        </tr>
-        {% endfor %}
-      </tbody>
-    </table>
-    </div>
-  </div>
+<!-- Taxi Passes -->
+{% if taxi_passes %}
+<div class="px-4">
+  <ol class="list-group">
+    <h3 class="display-6">Такси</h3>
+    {% for vehicle in taxi_passes %}
+    <li class="list-group-item d-flex justify-content-between align-items-start list-group-item-outline-warning">
+      <div class="ms-2 me-auto">
+        <div class="fw-bold">ТАКСИ {{vehicle.car_model}} {{vehicle.vin}} {{vehicle.color}}</div> 
+      </div>
+      <span class="badge bg-warning rounded-pill">{{vehicle.plot_owner.plot_number}}</span>
+      
+    </li>
+    {% endfor %}
+  </ol>
 </div>
+{% endif %}
+<!-- Taxi Passes -->
 
-
+<!-- Permanent Passes -->
+{% if permanent_passes %}
+<div class="px-4">
+  <ol class="list-group">  
+  <h3 class="display-6">Постоянные пропуска</h3>
+    {% for vehicle in permanent_passes %}
+    <li class="list-group-item d-flex justify-content-between align-items-start list-group-item-outline-success">
+      <div class="ms-2 me-auto">
+        <div class="fw-bold">{{vehicle.car_model}} {{vehicle.vin}}</div> 
+      </div>
+      <span class="badge bg-success rounded-pill">{{vehicle.owner.plot_number}}</span>
+      
+    </li>
+    {% endfor %}
+  </ol>
+</div>
+{% endif %}
+<!-- Permanent Passes -->
 
 {% include "footer.html" %}
