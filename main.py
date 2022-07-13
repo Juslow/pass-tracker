@@ -276,8 +276,9 @@ def home():
 @app.route("/transport-list", methods=["GET", "POST"])
 def transport_list():
     delete_outdated_data(expire_time=7)
-    temporary_passes = TemporaryPass.query.all()
-    permanent_passes = PermanentPass.query.all()
+    temporary_passes = TemporaryPass.query.filter_by(plot_owner_id=current_user.id)
+    # temporary_passes = TemporaryPass.query.all()
+    permanent_passes = PermanentPass.query.filter_by(owner_id=current_user.id)
     taxi_passes = TaxiPass.query.all()
     if current_user.is_authenticated:
         user_id = int(current_user.get_id())

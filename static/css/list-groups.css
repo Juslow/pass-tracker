@@ -1,0 +1,15 @@
+.list-group {
+    width: auto;
+    max-width: 460px;
+    margin: 4rem auto;
+  }
+
+  .list-group {
+    display: grid;
+    gap: .5rem;
+    border: 0;
+  }
+  .list-group .list-group-item {
+    cursor: pointer;
+    border-radius: .5rem;
+  }

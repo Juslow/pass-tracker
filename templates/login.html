@@ -23,14 +23,8 @@
         </div>
         <div class="text-center">
             <button type="submit" class="btn btn-secondary w-100 btn btn-lg">Войти</button>
-            <p class="my-4">
-                Забыли пароль?
-                <a href="{{url_for('reset_password_request')}}">Нажмите здесь, чтобы восстановить</a>
-            </p>
-            <p class="my-2">
-              Если вы еще не зарегистрировались, то
-              <a href="{{url_for('register')}}">нажмите здесь</a>
-            </p>
+            <a class="dropdown-item" href="{{url_for('register')}}">Впервые здесь? Регистрация</a>
+            <a class="dropdown-item" href="{{url_for('reset_password_request')}}">Забыли пароль?</a>
         </div>
         
     </form>
