@@ -39,12 +39,12 @@ app.config['ADMIN_PASSWORD'] = os.environ.get('ADMIN_PASSWORD')
 app.config['SECURITY_MAIL'] = os.environ.get('SECURITY_MAIL')
 app.config['SECURITY_PASSWORD'] = os.environ.get('SECURITY_PASSWORD')
 
-uri = os.getenv("DATABASE_URL")  # or other relevant config var
-if uri.startswith("postgres://"):
-    uri = uri.replace("postgres://", "postgresql://", 1)
+# uri = os.getenv("DATABASE_URL")  # or other relevant config var
+# if uri.startswith("postgres://"):
+#     uri = uri.replace("postgres://", "postgresql://", 1)
 # rest of connection code using the connection string `uri`
-app.config['SQLALCHEMY_DATABASE_URI'] = uri
-# app.config['SQLALCHEMY_DATABASE_URI'] = "sqlite:///car-pass.db"
+# app.config['SQLALCHEMY_DATABASE_URI'] = uri
+app.config['SQLALCHEMY_DATABASE_URI'] = "sqlite:///car-pass.db"
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 
@@ -217,7 +217,7 @@ def delete_outdated_data(expire_time):
     temporary_passes = TemporaryPass.query.all()
     for transport in temporary_passes:
         expiry_date = transport.expiry_date
-        if (today - expiry_date).day > expire_time:
+        if today - expiry_date > dt.timedelta(days=expire_time):
             db.session.delete(transport)
             db.session.commit()
     for taxi in taxi_list:
@@ -226,7 +226,7 @@ def delete_outdated_data(expire_time):
             db.session.delete(taxi)
             db.session.commit()
     for user in unconfirmed_users:
-        if (dt.datetime.now() - user.time_msg_sent).minute > 5:
+        if dt.datetime.now() - user.time_msg_sent > dt.timedelta(minutes=5):
             db.session.delete(user)
             db.session.commit()
 
