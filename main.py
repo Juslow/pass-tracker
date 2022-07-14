@@ -275,6 +275,8 @@ def home():
 
 @app.route("/transport-list", methods=["GET", "POST"])
 def transport_list():
+    if not current_user.is_authenticated:
+        return redirect(url_for('home'))
     delete_outdated_data(expire_time=7)
     temporary_passes = TemporaryPass.query.filter_by(plot_owner_id=current_user.id)
     # temporary_passes = TemporaryPass.query.all()
@@ -296,6 +298,8 @@ def transport_list():
 
 @app.route("/new-pass", methods=["GET", "POST"])
 def new_pass():
+    if not current_user.is_authenticated:
+        return redirect(url_for('home'))
     error = None
     form = NewPassForm()
     if form.validate_on_submit():
@@ -322,6 +326,8 @@ def new_pass():
 
 @app.route("/add-transport", methods=["GET", "POST"])
 def add_transport():
+    if not current_user.is_authenticated:
+        return redirect(url_for('home'))
     error = None
     form = NewTransportForm()
     if form.validate_on_submit():
@@ -341,6 +347,8 @@ def add_transport():
 
 @app.route("/add-taxi", methods=["GET", "POST"])
 def add_taxi():
+    if not current_user.is_authenticated:
+        return redirect(url_for('home'))
     form = AddTaxiForm()
     if form.validate_on_submit():
         vin = form.vin.data.upper()
@@ -358,6 +366,8 @@ def add_taxi():
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
+    if current_user.is_authenticated:
+        return redirect(url_for('home'))
     error = None
     form = SignInForm()
     if form.validate_on_submit():
@@ -380,6 +390,8 @@ def login():
 
 @app.route("/register", methods=["GET", "POST"])
 def register():
+    if current_user.is_authenticated:
+        return redirect(url_for('home'))
     delete_outdated_data(expire_time=7)
     error = None
     register_form = RegisterForm()
@@ -475,6 +487,8 @@ def reset_password(token):
 
 @app.route('/update/<int:pass_id>', methods=["GET", "POST"])
 def update_pass(pass_id):
+    if not current_user.is_authenticated:
+        return redirect(url_for('home'))
     pass_to_update = TemporaryPass.query.get(pass_id)
     update_form = UpdatePassForm()
     if update_form.validate_on_submit():
@@ -487,6 +501,8 @@ def update_pass(pass_id):
 
 @app.route('/delete-pass/<int:pass_id>')
 def delete_pass(pass_id):
+    if not current_user.is_authenticated:
+        return redirect(url_for('home'))
     pass_to_delete = TemporaryPass.query.get(pass_id)
     db.session.delete(pass_to_delete)
     db.session.commit()
@@ -495,6 +511,8 @@ def delete_pass(pass_id):
 
 @app.route('/delete-transport/<int:transport_id>')
 def delete_transport(transport_id):
+    if not current_user.is_authenticated:
+        return redirect(url_for('home'))
     permanent_pass_to_delete = PermanentPass.query.get(transport_id)
     db.session.delete(permanent_pass_to_delete)
     db.session.commit()
@@ -503,6 +521,8 @@ def delete_transport(transport_id):
 
 @app.route('/delete-taxi/<int:taxi_id>')
 def delete_taxi(taxi_id):
+    if not current_user.is_authenticated:
+        return redirect(url_for('home'))
     taxi_to_delete = TaxiPass.query.get(taxi_id)
     db.session.delete(taxi_to_delete)
     db.session.commit()
@@ -518,6 +538,8 @@ def logout():
 @app.route('/admin', methods=['GET', 'POST'])
 @admin_only
 def admin():
+    if not current_user.is_authenticated:
+        return redirect(url_for('home'))
     unconfirmed_users = UnconfirmedUser.query.all()
     users = User.query.all()
     temporary_passes = TemporaryPass.query.all()
@@ -532,6 +554,8 @@ def admin():
 @app.route('/admin/delete-user/<int:user_id>', methods=['GET', 'POST'])
 @admin_only
 def delete_user(user_id):
+    if not current_user.is_authenticated:
+        return redirect(url_for('home'))
     user_to_delete = User.query.get(user_id)
     db.session.delete(user_to_delete)
     db.session.commit()
@@ -541,6 +565,8 @@ def delete_user(user_id):
 @app.route('/security', methods=['GET'])
 @security_only
 def security():
+    if not current_user.is_authenticated:
+        return redirect(url_for('home'))
     temporary_passes = TemporaryPass.query.all()
     permanent_passes = PermanentPass.query.all()
     taxi_passes = TaxiPass.query.all()
