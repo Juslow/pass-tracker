@@ -353,9 +353,11 @@ def add_taxi():
     if form.validate_on_submit():
         vin = form.vin.data.upper()
         car_model = form.car_model.data.upper()
+        car_color = form.color.data.upper()
         access_time = form.access_time.data
         new_taxi_pass = TaxiPass(vin=vin,
                                  car_model=car_model,
+                                 color=car_color,
                                  plot_owner_id=current_user.get_id(),
                                  access_time=int(access_time))
         db.session.add(new_taxi_pass)
