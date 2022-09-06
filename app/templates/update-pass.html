@@ -19,24 +19,21 @@
 -->
 
 <main class="form-fields my-5">
-  <form method="POST" action="{{url_for('new_pass')}}">
+  <form method="POST" action="{{url_for('views.update_pass', pass_id=pass_id) }}">
     {{ form.csrf_token() }}
-    <h2 class="h3 mb-3 fw-normal">Создать новый пропуск</h2>
+    <h2 class="h3 mb-3 fw-normal">{{pass_to_update.car_model}} {{pass_to_update.vin}}</h2>
     {% if error %}
       <p class=error> {{ error }}
     {% endif %}
     <div class="form-floating">
       <div class="form-group">
-        {{ wtf.form_field(form.vin, type='text', class='form-control', placeholder='Например: Е999КН') }}
-        {{ wtf.form_field(form.car_model, type='text', class='form-control', placeholder='Например: BMW, Honda, KIA и т.д.') }}
         {{ wtf.form_field(form.validation_period, type='date', class='form-control') }}
       </div>
     </div>
     <div class="text-center">
-      <button type="submit" class="btn btn-secondary w-100 btn btn-lg">Добавить</button>
+      <button type="submit" class="btn btn-secondary w-100 btn btn-lg">Продолжить</button>
     </div>
   </form>
 </main>
 
 {% include "footer.html" %}
-

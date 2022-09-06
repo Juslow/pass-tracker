@@ -17,8 +17,8 @@
           </button>
         
           <ul class="dropdown-menu dropdown-menu-dark" aria-labelledby="dropdownMenuLink">
-            <li><a class="dropdown-item" href="{{url_for('update_pass', pass_id=vehicle.id) }}">Обновить</a></li>
-            <li><a class="dropdown-item" href="{{url_for('delete_pass', pass_id=vehicle.id) }}">Удалить</a></li>
+            <li><a class="dropdown-item" href="{{url_for('views.update_pass', pass_id=vehicle.id) }}">Обновить</a></li>
+            <li><a class="dropdown-item" href="{{url_for('views.delete_pass', pass_id=vehicle.id) }}">Удалить</a></li>
           </ul>
         
         <!-- Dropdown button -->
@@ -49,7 +49,7 @@
           </button>
         
           <ul class="dropdown-menu dropdown-menu-dark" aria-labelledby="dropdownMenuLink">
-            <li><a class="dropdown-item" href="{{url_for('delete_taxi', taxi_id=vehicle.id) }}">Удалить</a></li>
+            <li><a class="dropdown-item" href="{{url_for('views.delete_taxi', taxi_id=vehicle.id) }}">Удалить</a></li>
           </ul>
           Приедет с {{vehicle.access_time - 2}}:00 до {{vehicle.access_time}}:00
         <!-- Dropdown button -->
@@ -78,7 +78,7 @@
           </button>
         
           <ul class="dropdown-menu dropdown-menu-dark" aria-labelledby="dropdownMenuLink">
-            <li><a class="dropdown-item" href="{{url_for('delete_transport', transport_id=vehicle.id) }}">Удалить</a></li>
+            <li><a class="dropdown-item" href="{{url_for('views.delete_transport', transport_id=vehicle.id) }}">Удалить</a></li>
           </ul>
         
         <!-- Dropdown button -->
@@ -118,7 +118,7 @@
             <td>{{user.last_name}}</td>
             <td>{{user.plot_number}}</td>
             <td>{{user.email}}</td>
-            <td><a class="btn btn-outline-danger btn-sm" role="button" href="{{url_for('delete_user', user_id=user.id) }}">✗</a></td>
+            <td><a class="btn btn-outline-danger btn-sm" role="button" href="{{url_for('views.delete_user', user_id=user.id) }}">✗</a></td>
           </tr>
           {% endfor %}
         </tbody>

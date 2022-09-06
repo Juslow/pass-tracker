@@ -36,9 +36,9 @@
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
         -->
         <div class="btn-group" role="group" aria-label="Basic example">
-          <a href="{{url_for('add_transport')}}" class="btn btn-dark" >Постоянный</a>
-          <a href="{{url_for('new_pass')}}" class="btn btn-secondary">Временный</a>
-          <a href="{{url_for('add_taxi')}}" class="btn btn-warning">Такси</a>
+          <a href="{{url_for('views.add_transport')}}" class="btn btn-dark" >Постоянный</a>
+          <a href="{{url_for('views.new_pass')}}" class="btn btn-secondary">Временный</a>
+          <a href="{{url_for('views.add_taxi')}}" class="btn btn-warning">Такси</a>
         </div>
       </div>
     </div>
@@ -65,8 +65,8 @@
           </button>
         
           <ul class="dropdown-menu dropdown-menu-dark" aria-labelledby="dropdownMenuLink">
-            <li><a class="dropdown-item" href="{{url_for('update_pass', pass_id=vehicle.id) }}">Обновить</a></li>
-            <li><a class="dropdown-item" href="{{url_for('delete_pass', pass_id=vehicle.id) }}">Удалить</a></li>
+            <li><a class="dropdown-item" href="{{url_for('views.update_pass', pass_id=vehicle.id) }}">Обновить</a></li>
+            <li><a class="dropdown-item" href="{{url_for('views.delete_pass', pass_id=vehicle.id) }}">Удалить</a></li>
           </ul>
         
         <!-- Dropdown button -->
@@ -99,7 +99,7 @@
           </button>
         
           <ul class="dropdown-menu dropdown-menu-dark" aria-labelledby="dropdownMenuLink">
-            <li><a class="dropdown-item" href="{{url_for('delete_taxi', taxi_id=vehicle.id) }}">Удалить</a></li>
+            <li><a class="dropdown-item" href="{{url_for('views.delete_taxi', taxi_id=vehicle.id) }}">Удалить</a></li>
           </ul>
           Приедет с {{vehicle.access_time - 2}}:00 до {{vehicle.access_time}}:00
         <!-- Dropdown button -->
@@ -130,7 +130,7 @@
           </button>
         
           <ul class="dropdown-menu dropdown-menu-dark" aria-labelledby="dropdownMenuLink">
-            <li><a class="dropdown-item" href="{{url_for('delete_transport', transport_id=vehicle.id) }}">Удалить</a></li>
+            <li><a class="dropdown-item" href="{{url_for('views.delete_transport', transport_id=vehicle.id) }}">Удалить</a></li>
           </ul>
         
         <!-- Dropdown button -->

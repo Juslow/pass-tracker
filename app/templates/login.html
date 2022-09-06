@@ -3,7 +3,7 @@
 
 
 <main class="form-signin my-5 py-5">
-    <form method="POST" action="{{url_for('login')}}">
+    <form method="POST" action="{{url_for('auth.login')}}">
         {{ form.csrf_token() }}
 
         <h2 class="h3 mb-3 fw-normal">Вход в личной кабинет</h2>
@@ -23,36 +23,11 @@
         </div>
         <div class="text-center">
             <button type="submit" class="btn btn-secondary w-100 btn btn-lg">Войти</button>
-            <a class="dropdown-item" href="{{url_for('register')}}">Впервые здесь? Регистрация</a>
-            <a class="dropdown-item" href="{{url_for('reset_password_request')}}">Забыли пароль?</a>
+            <a class="dropdown-item" href="{{url_for('auth.register')}}">Впервые здесь? Регистрация</a>
+            <a class="dropdown-item" href="{{url_for('auth.reset_password_request')}}">Забыли пароль?</a>
         </div>
         
     </form>
 </main>
-<!--
-<main class="form-signin">  col-lg-8 col-md-10 mx-auto content
-  <form>
-    <img class="mb-4" src="../assets/brand/bootstrap-logo.svg" alt="" width="72" height="57">
-    <h1 class="h3 mb-3 fw-normal">Please sign in</h1>
-
-    <div class="form-floating">
-      <input type="email" class="form-control" id="floatingInput" placeholder="name@example.com">
-      <label for="floatingInput">Email address</label>
-    </div>
-    <div class="form-floating">
-      <input type="password" class="form-control" id="floatingPassword" placeholder="Password">
-      <label for="floatingPassword">Password</label>
-    </div>
-
-    <div class="checkbox mb-3">
-      <label>
-        <input type="checkbox" value="remember-me"> Remember me
-      </label>
-    </div>
-    <button class="w-100 btn btn-lg btn-primary" type="submit">Sign in</button>
-    <p class="mt-5 mb-3 text-muted">&copy; 2017–2021</p>
-  </form>
-</main>
--->
 
 {% include "footer.html" %}

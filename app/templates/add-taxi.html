@@ -15,17 +15,22 @@
 {% endblock %}
 -->
 <main class="form-fields my-5">
-  <form method="POST" action="{{url_for('add_transport')}}">
+  <form method="POST" action="{{url_for('views.add_taxi')}}">
     {{ form.csrf_token() }}
-    <h2 class="h3 mb-3 fw-normal">Добавить личный транспорт</h2>
+    <h2 class="h3 mb-3 fw-normal">Такси</h2>
     {% if error %}
       <p class=error> {{ error }}
     {% endif %}
     <div class="form-floating">
-      <div class="form-group">
-        {{ wtf.form_field(form.vin, type='text', class='form-control', placeholder='Например: Е999КН') }}
-        {{ wtf.form_field(form.car_model, type='text', class='form-control', placeholder='Например: BMW, Honda, KIA и т.д.') }}
-      </div>
+        <div class="form-group">
+            {{ wtf.form_field(form.access_time, type='date', class='form-control') }}
+        </div>
+        <p>*Опциональные поля</p>
+        <div class="input-group">
+            {{ form.vin(type='text', placeholder='Номер*', class='form-control') }}
+            {{ form.car_model(type='text', placeholder='Марка*', class='form-control') }}
+            {{ form.color(type='text', placeholder='Цвет*', class='form-control') }}
+        </div>
     </div>
     <div class="text-center">
       <button type="submit" class="btn btn-secondary w-100 btn btn-lg">Добавить</button>

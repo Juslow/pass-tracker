@@ -2,7 +2,7 @@
 {% include "header.html" %}
 
 <main class="form-fields my-5">
-    <form method="POST" action="{{url_for('register')}}">
+    <form method="POST" action="{{url_for('auth.register')}}">
         {{ form.csrf_token() }}
         <h2 class="h8 mb-3 fw-normal">Регистрация</h2>
 
@@ -38,18 +38,6 @@
     </form>
 </main>
 
-<!--
-  <div class="container">
-    <h2>Регистрация</h2>
-    <div class="row">
-      <div class="col-lg-8 col-md-10 mx-auto content">
-        {% if error %}
-            <p class=error> {{ error }}
-        {% endif %}
-        {{ wtf.quick_form(form, novalidate=True, button_map={"submit": "primary"}) }}
-      </div>
-    </div>
-  </div>
--->
+
 
 {% include "footer.html" %}
