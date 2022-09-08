@@ -10,15 +10,11 @@
         {% if error %}
             <p class=error> {{ error }}
         {% endif %}
-        <!-- {{ wtf.quick_form(form, novalidate=True, button_map={"submit": "primary"}) }} -->
 
         <div class="form-floating">
             <div class="form-group">
                 {{ form.email(type='email', placeholder='Электронная почта', class='form-control', novalidate='True') }}
                 {{ form.password(type='password', placeholder='Пароль', class='form-control', novalidate=True) }}
-                <!--
-                {{ wtf.form_field(form.email, type='email', id='floatingInput', class='form-control', placeholder='name@example.com') }}
-                {{ wtf.form_field(form.password, type='password', class='form-control', placeholder='password') }} -->
             </div>
         </div>
         <div class="text-center">

@@ -12,7 +12,6 @@ login_manager = LoginManager()
 
 
 def create_app():
-
     app = Flask(__name__)
     app.config.from_object(__name__ + '.ConfigClass')
 
@@ -40,5 +39,4 @@ def create_database(app):
     # if not path.exists('app/' + DB_NAME):
     #     db.create_all(app=app)
     #     print('Created Database!')
-
 

@@ -4,7 +4,7 @@ from wtforms.validators import DataRequired, Length, EqualTo, Email, Optional
 from .functions import taxi_call_intervals
 
 PLOT_NUMBER_CHOICES = [i for i in range(1, 20)]
-SETTLEMENT_CHOICES = [('1', 'СНТ "Новово-2"')]
+SETTLEMENT_CHOICES = [('1', 'Коттеджный поселок №1"')]
 
 
 class NewPassForm(FlaskForm):

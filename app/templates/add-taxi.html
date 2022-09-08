@@ -1,19 +1,6 @@
 {% import "bootstrap/wtf.html" as wtf %}
 {% include "header.html" %}
 
-<!--
-{% block content %}
-
-  <div class="container">
-    <div class="row">
-      <div class="col-md-6">
-        {{ wtf.quick_form(form, novalidate=True, button_map={"submit": "primary"}) }}
-      </div>
-    </div>
-  </div>
-
-{% endblock %}
--->
 <main class="form-fields my-5">
   <form method="POST" action="{{url_for('views.add_taxi')}}">
     {{ form.csrf_token() }}

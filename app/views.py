@@ -1,5 +1,6 @@
 from flask import Blueprint, render_template, redirect, url_for
 from flask_login import current_user
+from werkzeug.security import generate_password_hash
 
 from . import db, login_manager
 from .models import Settlement, User, UnconfirmedUser, PermanentPass, TemporaryPass, TaxiPass
@@ -10,11 +11,9 @@ import datetime as dt
 from datetime import date
 from functools import wraps
 
-
 views = Blueprint('views', __name__)
 
 
-# TODO: New wraps file
 def admin_only(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
@@ -22,6 +21,7 @@ def admin_only(f):
             return f(*args, **kwargs)
         else:
             return render_template('403.html')
+
     return decorated_function
 
 
@@ -41,14 +41,21 @@ def load_user(user_id):
     return User.query.get(user_id)
 
 
-# add_novovo2_settlement()
-# create_admin()
-# create_security_account()
-
-
 # ---------------------Web routes-----------------------
 @views.route("/")
 def home():
+    # Creates test user
+    if not User.query.filter(User.email == 'member@example.com').first():
+        user = User(
+            first_name='Test',
+            last_name='User',
+            email='member@example.com',
+            plot_number='11',
+            password=generate_password_hash('password', 'pbkdf2:sha256', 8),
+        )
+        db.session.add(user)
+        db.session.commit()
+
     if current_user.is_authenticated:
         return redirect(url_for('views.transport_list'))
     else:
@@ -161,7 +168,6 @@ def update_pass(pass_id):
                            logged_in=current_user.is_authenticated)
 
 
-# TODO: Emerge delete routes into one route
 @views.route('/delete-pass/<int:pass_id>')
 def delete_pass(pass_id):
     if not current_user.is_authenticated:
@@ -230,4 +236,3 @@ def security():
     taxi_passes = TaxiPass.query.all()
     return render_template('security.html', temporary_passes=temporary_passes, permanent_passes=permanent_passes,
                            taxi_passes=taxi_passes, today=date.today(), logged_in=current_user.is_authenticated)
-

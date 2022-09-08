@@ -19,25 +19,16 @@
             {{ form.settlement(type='number', placeholder='Название поселка', class='form-control') }}
             {{ form.plot_number(type='number', placeholder='Номер участка', class='form-control') }}
           </div>
-          <div class="form-group">  
+          <div class="form-group">
             {{ form.email(type='email', placeholder='Электронная почта', class='form-control') }}
             {{ form.password(type='password', placeholder='Пароль', class='form-control') }}
             {{ form.repeat_password(type='password', novalidate=True, placeholder='Повторите пароль', class='form-control') }}
-          </div>  
-            <!--
-              {{ wtf.form_field(form.email, type='text', placeholder='name@example.com') }}
-              {{ wtf.form_field(form.plot_number, type='number', placeholder='Номер участка') }}
-              {{ wtf.form_field(form.password, type='password', placeholder='password') }}
-              {{ wtf.form_field(form.repeat_password, novalidate=True, type='password', placeholder='password') }}
-          -->
           </div>
-          <div class="text-center">
-          <button type="submit" class="btn btn-secondary w-100 btn btn-lg">Зарегистрироваться</button>
-          </div>
+        </div>
+        <div class="text-center">
+            <button type="submit" class="btn btn-secondary w-100 btn btn-lg">Зарегистрироваться</button>
         </div>
     </form>
 </main>
-
-
 
 {% include "footer.html" %}
