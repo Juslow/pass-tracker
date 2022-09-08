@@ -44,18 +44,6 @@ def load_user(user_id):
 # ---------------------Web routes-----------------------
 @views.route("/")
 def home():
-    # Creates test user
-    if not User.query.filter(User.email == 'member@example.com').first():
-        user = User(
-            first_name='Test',
-            last_name='User',
-            email='member@example.com',
-            plot_number='11',
-            password=generate_password_hash('password', 'pbkdf2:sha256', 8),
-        )
-        db.session.add(user)
-        db.session.commit()
-
     if current_user.is_authenticated:
         return redirect(url_for('views.transport_list'))
     else:
