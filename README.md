@@ -1,4 +1,4 @@
-# Pass tracker Flask Web-aplication
+# Pass tracker Flask Web-application
 ## General Information
 The application is used for tracking and controlling access to private residential territory. It is implemented using Flask and Heroku.
 The SQAlchemy library was used to work with databases. 
