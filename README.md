@@ -4,7 +4,7 @@ Originally this project was created for a particular settlement (that's why it i
 
 The application is used for tracking and controlling access to private residential territory. It is implemented using Flask and Heroku.
 The SQAlchemy library was used to work with database. 
-SQLite database was used during testing, and after deployment on Heroku, PostgreSQL (Heroku Postgre) was connected.  
+SQLite database was applied during testing, and after deployment on Heroku, PostgreSQL (Heroku Postgre) was connected.  
 The application allows for registration, authentication, as well as features for changing user data (changing the password and parameters of added passes).
 
 Application functions:
