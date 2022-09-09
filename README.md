@@ -3,7 +3,7 @@
 Originally this project was created for a particular settlement (that's why it is in Russian). Here I want to share a copy of that application with some adjustments.
 
 The application is used for tracking and controlling access to private residential territory. It is implemented using Flask and Heroku.
-The SQAlchemy library was used to work with database. 
+The SQLAlchemy library was used to work with database. 
 SQLite database was applied during testing, and after deployment on Heroku, PostgreSQL (Heroku Postgre) was connected.  
 The application allows for registration, authentication, as well as features for changing user data (changing the password and parameters of added passes).
 
@@ -49,7 +49,7 @@ and commenting
 
 Веб-приложение позволяет отслеживать и контролировать доступ для въезда на частную жилую территорию.
 Приложение реализовано с помощью Flask и Heroku.
-Для работы с базой данных использовалась библиотека SQAlchemy. 
+Для работы с базой данных использовалась библиотека SQLAlchemy. 
 При тестировании применялась база данных SQLite, а после развертывания на Heroku была подключена PostgreSQL (Heroku Postgre).  
 Приложение позволяет выполнять регистрацию, аутентификацию, а также функции по изменению данных пользователя (смена пароля, изменение параметров добавленных пропусков).
 
