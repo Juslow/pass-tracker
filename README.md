@@ -2,7 +2,7 @@
 ## General Information
 Originally this project was created for a particular settlement (that's why it is in Russian). Here I want to share a copy of that application with some adjustments.
 
-The application is used for tracking and controlling access to private residential territory. It is implemented using Flask and Heroku.
+The application is used for tracking and controlling access to private residential territory. It is implemented using Flask.
 The SQLAlchemy library was used to work with database. 
 SQLite database was applied during testing, and after deployment on Heroku, PostgreSQL (Heroku Postgre) was connected.  
 The application allows for registration, authentication, as well as features for changing user data (changing the password and parameters of added passes).
@@ -14,7 +14,7 @@ Application functions:
 - Adding/editing/deleting/viewing passes for entry to private residential areas;
 - Separate account for the security guard, allowing to view active passes for all residents;
 
-You can try this application in action [here](https://vehicle-pass.herokuapp.com/) by using a test account (if you don't want to register) or by creating a new one.
+You can try this application in action [here](https://vehicle-pass.herokuapp.com/) **(temporarily unavailable)** by using a test account (if you don't want to register) or by creating a new one.
 
 Test account
 ```
@@ -48,7 +48,7 @@ and commenting
 и я бы хотел поделиться этим проектом с некоторыми внесенными правками для возможности получения обратной связи и дальнейшего развития как Web-разработчик.
 
 Веб-приложение позволяет отслеживать и контролировать доступ для въезда на частную жилую территорию.
-Приложение реализовано с помощью Flask и Heroku.
+Приложение реализовано с помощью Flask.
 Для работы с базой данных использовалась библиотека SQLAlchemy. 
 При тестировании применялась база данных SQLite, а после развертывания на Heroku была подключена PostgreSQL (Heroku Postgre).  
 Приложение позволяет выполнять регистрацию, аутентификацию, а также функции по изменению данных пользователя (смена пароля, изменение параметров добавленных пропусков).
@@ -60,7 +60,7 @@ and commenting
 - Добавление/редактирование/удаление/просмотр пропусков для въезда на частную жилую территорию;
 - Отдельный личный кабинет для охраника, позволяющий просматривать активные пропуска всех жильцов;
 
-Данное приложение можете опробовать по [ссылке](https://vehicle-pass.herokuapp.com/), используя тестовый аккаунт или пройдя регистрацию как новый пользователь.
+Данное приложение можете опробовать по [ссылке](https://vehicle-pass.herokuapp.com/) **(временно недоступно)**, используя тестовый аккаунт или пройдя регистрацию как новый пользователь.
 
 Тестовый аккаунт
 ```
